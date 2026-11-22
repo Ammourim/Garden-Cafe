@@ -5,11 +5,20 @@ Landing page estática do GARDEN (HTML, CSS e JavaScript puros).
 ## Estrutura
 
 ```
-index.html      Página principal
-css/style.css   Estilos
-js/main.js      Scripts
-assets/         Imagens, fontes e outros arquivos
+index.html          Página principal (todas as seções do site)
+css/style.css       Estilos, com os tokens do design system Garden Café
+js/menu-data.js     Cardápio completo, endereço, horário e WhatsApp (edite preços aqui)
+js/main.js          Animações, cardápio interativo, menu mobile e reserva pelo WhatsApp
+js/vendor/          GSAP 3.12.5, ScrollTrigger e Lenis 1.1.13 (animações e rolagem suave)
+assets/img/         Fotos, logo da flor e ícones do site
+system-design/      Levantamento do Instagram (fonte do conteúdo real)
 ```
+
+### Animações e acessibilidade
+
+- Rolagem suave (Lenis) só em computadores com mouse; no celular a rolagem é a nativa.
+- Quem ativa "reduzir movimento" no sistema vê o site completo, sem animações.
+- O card do show AdriaNey some sozinho depois de 28/11/2026 e dá lugar a um aviso de próximos eventos (atributo `data-until` em `index.html`).
 
 ## Como abrir a página localmente
 

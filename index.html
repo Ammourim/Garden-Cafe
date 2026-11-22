@@ -2,14 +2,491 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GARDEN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Garden Café · Café e comida arretada · Recife</title>
+  <meta name="description" content="Cafeteria nordestina no Jardim São Paulo, Recife. Cuscuz, tapiocas, caldos, croissants e cafés com sabor de Nordeste. Todos os dias, das 15h às 22h. Reservas pelo WhatsApp.">
+  <meta name="theme-color" content="#15281C">
+  <meta property="og:title" content="Garden Café · Café e comida arretada">
+  <meta property="og:description" content="Um refúgio em meio à correria do cotidiano de Recife. Todos os dias, das 15h às 22h.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:image" content="assets/img/fachada.webp">
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,700&family=Oswald:wght@500;600;700&family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800;1,6..12,400&display=swap">
+  <link rel="preload" as="image" href="assets/img/cuscuz-doce.webp">
   <link rel="stylesheet" href="css/style.css">
+
+  <script>
+    // Ativa os estados iniciais das animações só quando há JS e o usuário não pediu menos movimento.
+    (function () {
+      var d = document.documentElement;
+      d.classList.add('js');
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('reduced');
+      try { if (sessionStorage.getItem('garden-intro')) d.classList.add('no-intro'); } catch (e) {}
+    })();
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CafeOrCoffeeShop",
+    "name": "Garden Café",
+    "servesCuisine": "Nordestina",
+    "telephone": "+55 81 97900-3779",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Rua Doutor Gustavo Pinto, 393",
+      "addressLocality": "Recife",
+      "addressRegion": "PE",
+      "postalCode": "50781-740",
+      "addressCountry": "BR"
+    },
+    "openingHours": "Mo-Su 15:00-22:00",
+    "sameAs": ["https://www.instagram.com/gardencafepe/", "https://www.facebook.com/gardencaferecife"]
+  }
+  </script>
 </head>
 <body>
-  <main class="hero">
-    <h1>GARDEN</h1>
+  <!-- Ícones (traço fino, estilo Lucide, conforme o design system) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+      <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+      <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
+      <symbol id="i-instagram" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><path d="M17.5 6.5h.01"/></symbol>
+      <symbol id="i-facebook" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></symbol>
+      <symbol id="i-ticket" viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></symbol>
+      <symbol id="i-cake" viewBox="0 0 24 24"><circle cx="9" cy="7" r="2"/><path d="M7.2 7.9 3 11v9c0 .6.4 1 1 1h16c.6 0 1-.4 1-1v-9c0-2-3-6-7-8l-3.6 2.6"/><path d="M16 13H3"/><path d="M16 17H3"/></symbol>
+      <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+      <symbol id="i-nav" viewBox="0 0 24 24"><path d="M3 11 22 2l-9 19-2-8-8-2z"/></symbol>
+      <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/><path d="M6 2v2"/></symbol>
+      <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+      <!-- Ramo botânico de traço fino usado como floreio -->
+      <symbol id="i-sprig" viewBox="0 0 120 120"><path d="M14 108C40 84 62 58 104 14"/><path d="M34 88c-10-4-18-14-18-26 12 2 20 12 18 26Z"/><path d="M34 88c4-10 14-16 26-14-4 12-14 16-26 14Z"/><path d="M54 66c-9-5-14-15-12-27 11 4 16 15 12 27Z"/><path d="M54 66c5-9 15-14 27-11-5 11-15 14-27 11Z"/><path d="M74 44c-7-6-10-16-6-27 10 6 12 17 6 27Z"/><path d="M74 44c6-8 17-11 27-6-6 10-17 11-27 6Z"/></symbol>
+    </defs>
+  </svg>
+
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Abertura -->
+  <div class="intro" aria-hidden="true">
+    <div class="intro__inner">
+      <img class="intro__flower" src="assets/img/garden-flower-cream-256.webp" alt="" width="128" height="128">
+      <span class="intro__word">Garden <span>Café</span></span>
+    </div>
+  </div>
+
+  <!-- Cabeçalho -->
+  <header class="header" id="topo">
+    <div class="header__bar container">
+      <a class="wordmark" href="#inicio" aria-label="Garden Café, voltar ao início">
+        <img src="assets/img/garden-flower-cream-256.webp" alt="" width="34" height="34">
+        <span>Garden Café</span>
+      </a>
+      <nav class="nav" aria-label="Principal">
+        <a href="#cardapio">Cardápio</a>
+        <a href="#sugestao">Sugestão do dia</a>
+        <a href="#eventos">Eventos</a>
+        <a href="#reservas">Reservas</a>
+        <a href="#onde">Onde estamos</a>
+      </nav>
+      <a class="btn btn--accent btn--sm header__cta" href="#reservas"><svg class="ic"><use href="#i-whatsapp"/></svg>Reservar</a>
+      <button class="burger" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-mobile">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Menu mobile em tela cheia -->
+  <div class="drawer" id="menu-mobile" aria-hidden="true">
+    <nav class="drawer__nav" aria-label="Menu">
+      <a href="#inicio"><small>01</small>Início</a>
+      <a href="#cardapio"><small>02</small>Cardápio</a>
+      <a href="#sugestao"><small>03</small>Sugestão do dia</a>
+      <a href="#eventos"><small>04</small>Eventos</a>
+      <a href="#reservas"><small>05</small>Reservas</a>
+      <a href="#onde"><small>06</small>Onde estamos</a>
+    </nav>
+    <div class="drawer__foot">
+      <p><svg class="ic"><use href="#i-clock"/></svg>Todos os dias, 15h às 22h</p>
+      <p><svg class="ic"><use href="#i-pin"/></svg>Rua Dr. Gustavo Pinto, 393</p>
+      <a class="btn btn--accent btn--lg btn--full" href="#reservas"><svg class="ic"><use href="#i-whatsapp"/></svg>Reservar mesa</a>
+    </div>
+  </div>
+
+  <main id="conteudo">
+
+    <!-- HERO -->
+    <section class="hero" id="inicio" aria-labelledby="hero-title">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <svg class="sprig sprig--hero" aria-hidden="true"><use href="#i-sprig"/></svg>
+      <div class="container hero__grid">
+        <div class="hero__copy">
+          <span class="eyebrow eyebrow--deep" data-hero="fade">Jardim São Paulo · Recife</span>
+          <h1 class="hero__title" id="hero-title" data-split>Café e comida <em class="script">arretada.</em></h1>
+          <p class="hero__lead" data-hero="fade">Um refúgio em meio à correria do cotidiano de Recife. Cuscuz, tapiocas, caldos, croissants e cafés com sabor de Nordeste.</p>
+          <div class="hero__ctas" data-hero="fade">
+            <a class="btn btn--accent btn--lg" href="#reservas"><svg class="ic"><use href="#i-whatsapp"/></svg>Reservar mesa</a>
+            <a class="btn btn--outline-cream btn--lg" href="#cardapio">Ver cardápio<svg class="ic"><use href="#i-arrow-right"/></svg></a>
+          </div>
+          <ul class="hero__facts" data-hero="fade">
+            <li><svg class="ic"><use href="#i-clock"/></svg><span class="js-open-status">Todos os dias, 15h às 22h</span></li>
+            <li><svg class="ic"><use href="#i-pin"/></svg>Rua Dr. Gustavo Pinto, 393</li>
+          </ul>
+        </div>
+        <div class="hero__plates" aria-hidden="true">
+          <div class="plate plate--xl" data-plate="main"><img src="assets/img/cuscuz-doce.webp" alt="" width="376" height="402" fetchpriority="high"></div>
+          <div class="plate plate--sm" data-plate="side"><img src="assets/img/maria-bonita.webp" alt="" width="333" height="460"></div>
+          <div class="plate plate--xs" data-plate="tiny"><img src="assets/img/croissant.webp" alt="" width="212" height="176"></div>
+          <span class="badge badge--oxe" data-plate="badge">Oxe! É bom demais!</span>
+        </div>
+      </div>
+      <a class="hero__scroll" href="#sobre" aria-label="Rolar para conhecer o Garden"><span></span></a>
+    </section>
+
+    <!-- FAIXA EM MOVIMENTO (acompanha a rolagem, não fica em loop) -->
+    <div class="ribbon" aria-hidden="true">
+      <div class="ribbon__track">
+        <span>Cuscuz</span><img src="assets/img/garden-flower-cream-256.webp" alt="" width="28" height="28"><span class="script">tapiocas</span><img src="assets/img/garden-flower-cream-256.webp" alt="" width="28" height="28"><span>Caldos</span><img src="assets/img/garden-flower-cream-256.webp" alt="" width="28" height="28"><span class="script">croissants</span><img src="assets/img/garden-flower-cream-256.webp" alt="" width="28" height="28"><span>Cafés</span><img src="assets/img/garden-flower-cream-256.webp" alt="" width="28" height="28"><span class="script">bolo de rolo</span><img src="assets/img/garden-flower-cream-256.webp" alt="" width="28" height="28"><span>Cuscuz</span><img src="assets/img/garden-flower-cream-256.webp" alt="" width="28" height="28"><span class="script">tapiocas</span><img src="assets/img/garden-flower-cream-256.webp" alt="" width="28" height="28"><span>Caldos</span><img src="assets/img/garden-flower-cream-256.webp" alt="" width="28" height="28"><span class="script">croissants</span>
+      </div>
+    </div>
+
+    <!-- SOBRE / MANIFESTO -->
+    <section class="about" id="sobre" aria-labelledby="about-title">
+      <svg class="sprig sprig--about" aria-hidden="true"><use href="#i-sprig"/></svg>
+      <div class="container about__grid">
+        <div class="about__text">
+          <span class="eyebrow" data-reveal>Bem-vindo ao Garden</span>
+          <h2 class="sr-only" id="about-title">Sobre o Garden Café</h2>
+          <p class="manifesto" data-words>Um cantinho feito para desacelerar. Boa comida, boas histórias e grandes encontros, do jeitinho que a gente gosta.</p>
+          <ul class="stats">
+            <li data-reveal><strong>15h<span>–</span>22h</strong><span>todos os dias da semana</span></li>
+            <li data-reveal><strong data-count="0" class="js-count-items">150+</strong><span>itens no cardápio</span></li>
+            <li data-reveal><strong class="script">daqui</strong><span>nomes da cultura pernambucana</span></li>
+          </ul>
+        </div>
+        <div class="about__media">
+          <figure class="frame frame--tall" data-clip><img src="assets/img/maria-bonita.webp" alt="Sobremesa Maria Bonita servida no salão do Garden" width="333" height="460" loading="lazy" data-speed="-0.06"></figure>
+          <figure class="frame frame--short" data-clip><img src="assets/img/reel-fachada.webp" alt="Fachada verde do Garden Café com toldo creme" width="185" height="234" loading="lazy" data-speed="0.06"></figure>
+          <img class="about__badge" src="assets/img/garden-flower-badge-256.webp" alt="" width="120" height="120" loading="lazy" data-spin>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUGESTÃO DO DIA -->
+    <section class="daily" id="sugestao" aria-labelledby="daily-title">
+      <div class="container daily__grid">
+        <div class="daily__copy">
+          <span class="badge badge--novidade" data-reveal>Novidade</span>
+          <h2 class="poster" id="daily-title" data-split>Sugestão do dia</h2>
+          <p data-reveal>Todo dia tem um prato com preço especial. Fica de olho, porque quando entra na sugestão, o sabor vem e o preço desce!</p>
+        </div>
+        <a class="daily-card" href="https://www.instagram.com/stories/gardencafepe/" target="_blank" rel="noopener" data-reveal>
+          <div class="daily-card__img"><img src="assets/img/bolo-de-rolo.webp" alt="Bolo de rolo servido com café" width="194" height="258" loading="lazy"></div>
+          <div class="daily-card__body">
+            <span class="eyebrow eyebrow--accent">Hoje no Garden</span>
+            <span class="daily-card__title">Veja a sugestão de hoje</span>
+            <span class="muted">Anunciada todos os dias nos nossos stories, com preço especial.</span>
+            <span class="link-arrow">Abrir os stories <svg class="ic"><use href="#i-arrow-up-right"/></svg></span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- DELÍCIAS DO NORDESTE -->
+    <section class="delights" aria-labelledby="delights-title">
+      <div class="container">
+        <div class="section-title" data-reveal>
+          <span class="eyebrow">Do nosso cardápio</span>
+          <h2 id="delights-title" data-split>Delícias do nosso Nordeste</h2>
+        </div>
+        <div class="delights__rail" role="list">
+          <article class="dish" role="listitem" data-dish='{"name":"Maria Bonita","desc":"Torrada de bolo de rolo, sorvete de nata goiaba e creme de queijo do reino.","price":"R$ 23","img":"maria-bonita"}'>
+            <button class="dish__btn" type="button" aria-label="Ver detalhes: Maria Bonita">
+              <span class="dish__img"><img src="assets/img/maria-bonita.webp" alt="Maria Bonita: bolo de rolo com sorvete e goiabada" width="333" height="460" loading="lazy"></span>
+              <span class="dish__body"><span class="badge badge--plate">Maria Bonita</span><span class="muted">Torrada de bolo de rolo, sorvete de nata goiaba e creme de queijo do reino</span><span class="dish__price">R$ 23</span></span>
+            </button>
+          </article>
+          <article class="dish" role="listitem" data-dish='{"name":"Cabeleira do Zezé","desc":"Cuscuz doce com doce de leite, queijo manteiga e banana caramelizada, coberto com doce de leite e fios de casca de banana frita.","price":"R$ 29","img":"cuscuz-doce"}'>
+            <button class="dish__btn" type="button" aria-label="Ver detalhes: Cabeleira do Zezé">
+              <span class="dish__img"><img src="assets/img/cuscuz-doce.webp" alt="Cuscuz doce Cabeleira do Zezé em prato colorido" width="376" height="402" loading="lazy"></span>
+              <span class="dish__body"><span class="badge badge--plate">Cabeleira do Zezé</span><span class="muted">Doce de leite, queijo manteiga e banana caramelizada</span><span class="dish__price">R$ 29</span></span>
+            </button>
+          </article>
+          <article class="dish" role="listitem" data-dish='{"name":"Croissant de domingo","desc":"Croissant douradinho, recheio generoso e aquele cafezinho pra completar o momento. Te esperamos no Garden Café, a partir das 15h.","price":"","img":"croissant"}'>
+            <button class="dish__btn" type="button" aria-label="Ver detalhes: Croissant de domingo">
+              <span class="dish__img"><img src="assets/img/croissant.webp" alt="Croissants recheados e cappuccino" width="212" height="176" loading="lazy"></span>
+              <span class="dish__body"><span class="badge badge--plate">Croissant de domingo</span><span class="muted">Te esperamos no Garden Café, a partir das 15h</span><span class="dish__price">a partir de R$ 26</span></span>
+            </button>
+          </article>
+          <article class="dish" role="listitem" data-dish='{"name":"Quiche de camarão","desc":"Massa delicada, recheio caprichado e aquele sabor arretado que conquista logo na primeira mordida.","price":"R$ 20","img":"quiche-camarao"}'>
+            <button class="dish__btn" type="button" aria-label="Ver detalhes: Quiche de camarão">
+              <span class="dish__img"><img src="assets/img/quiche-camarao.webp" alt="Quiche de camarão" width="322" height="460" loading="lazy"></span>
+              <span class="dish__body"><span class="badge badge--plate">Quiche de camarão</span><span class="muted">Massa delicada, recheio caprichado</span><span class="dish__price">R$ 20</span></span>
+            </button>
+          </article>
+        </div>
+        <div class="center" data-reveal><a class="btn btn--secondary" href="#cardapio">Cardápio completo<svg class="ic"><use href="#i-arrow-right"/></svg></a></div>
+      </div>
+    </section>
+
+    <!-- CARDÁPIO -->
+    <section class="menu" id="cardapio" aria-labelledby="menu-title">
+      <div class="menu__head">
+        <div class="container">
+          <div class="section-title section-title--left section-title--deep" data-reveal>
+            <span class="eyebrow eyebrow--deep">Cardápio</span>
+            <h2 id="menu-title" data-split>Nosso cardápio</h2>
+            <span class="script-accent">com nomes daqui</span>
+          </div>
+        </div>
+        <div class="menu__tabs-wrap">
+          <div class="container">
+            <div class="tabs" role="tablist" aria-label="Categorias do cardápio"></div>
+          </div>
+        </div>
+      </div>
+      <div class="container menu__grid">
+        <div class="menu-panel" role="tabpanel" aria-live="polite">
+          <div class="menu-panel__head">
+            <h3 class="menu-panel__title">Cuscuz</h3>
+            <label class="switch">
+              <input type="checkbox" class="js-cheap">
+              <span class="switch__track" aria-hidden="true"><span></span></span>
+              <span>Até R$ 25</span>
+            </label>
+          </div>
+          <p class="menu-panel__note" hidden></p>
+          <div class="menu-panel__list"></div>
+          <noscript><p>Ative o JavaScript para ver o cardápio completo, ou <a href="https://drive.google.com/file/d/1xTZ1eb9dNav754_FVXNR_p6avcQza7se/view">abra o cardápio em PDF</a>.</p></noscript>
+        </div>
+        <aside class="menu-photo" aria-hidden="true">
+          <div class="menu-photo__frame"><img src="assets/img/cuscuz-doce.webp" alt="" width="376" height="402" loading="lazy"></div>
+          <span class="badge badge--plate menu-photo__cap">Cabeleira do Zezé</span>
+        </aside>
+      </div>
+      <p class="container menu__foot">Preços em reais, conforme o cardápio impresso. Valores e disponibilidade podem mudar: confirme no salão.</p>
+    </section>
+
+    <!-- EVENTOS -->
+    <section class="events" id="eventos" aria-labelledby="events-title">
+      <div class="container">
+        <div class="section-title section-title--left section-title--deep" data-reveal>
+          <span class="eyebrow eyebrow--deep">Agenda</span>
+          <h2 id="events-title" data-split>Eventos no Garden</h2>
+          <span class="script-accent">boas histórias</span>
+        </div>
+
+        <article class="event" data-until="2026-11-29" data-reveal>
+          <div class="event__img" data-clip><img src="assets/img/evento-adrianey.webp" alt="Cartaz do show AdriaNey no Garden Café, 28 de novembro, 20h" width="395" height="489" loading="lazy"></div>
+          <div class="event__body">
+            <span class="badge badge--novidade">Show</span>
+            <h3>AdriaNey: Uma Performance Cristal</h3>
+            <p>Show do ator Adriano Cabral inspirado na obra de Ney Matogrosso, com clássicos como Sangue Latino, Homem com H e Pavão Misterioso em performances teatrais.</p>
+            <ul class="event__meta">
+              <li><svg class="ic"><use href="#i-calendar"/></svg>28 de novembro</li>
+              <li><svg class="ic"><use href="#i-clock"/></svg>20h</li>
+              <li><svg class="ic"><use href="#i-ticket"/></svg>R$ 30,00</li>
+            </ul>
+            <div class="event__ctas">
+              <a class="btn btn--accent" href="#reservas" data-reserve="Evento"><svg class="ic"><use href="#i-whatsapp"/></svg>Faça sua reserva</a>
+              <a class="btn btn--outline-cream" href="tel:+5581986059740"><svg class="ic"><use href="#i-phone"/></svg>(81) 98605-9740</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="event event--empty" hidden>
+          <div class="event__body">
+            <h3>Novos eventos em breve</h3>
+            <p>Shows, música e encontros acontecem no Garden ao longo do ano. Acompanhe a agenda no nosso Instagram.</p>
+            <div class="event__ctas"><a class="btn btn--cream" href="https://www.instagram.com/gardencafepe/" target="_blank" rel="noopener"><svg class="ic"><use href="#i-instagram"/></svg>@gardencafepe</a></div>
+          </div>
+        </article>
+
+        <div class="events__types">
+          <a class="type-card" href="#reservas" data-reserve="Aniversário" data-reveal>
+            <svg class="ic ic--lg"><use href="#i-cake"/></svg>
+            <span class="type-card__title">Aniversários</span>
+            <span>Aniversariante no Garden ganha sobremesa!</span>
+            <span class="link-arrow">Reservar <svg class="ic"><use href="#i-arrow-right"/></svg></span>
+          </a>
+          <a class="type-card" href="#reservas" data-reserve="Confraternização" data-reveal>
+            <svg class="ic ic--lg"><use href="#i-users"/></svg>
+            <span class="type-card__title">Confraternizações</span>
+            <span>Reserve o nosso espaço para a sua confraternização.</span>
+            <span class="link-arrow">Reservar <svg class="ic"><use href="#i-arrow-right"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESERVAS -->
+    <section class="reserve" id="reservas" aria-labelledby="reserve-title">
+      <div class="container reserve__grid">
+        <div class="reserve__intro">
+          <div class="section-title section-title--left" data-reveal>
+            <span class="eyebrow">Disponibilidade para</span>
+            <h2 id="reserve-title" data-split>Reservas</h2>
+            <span class="script-accent">para eventos</span>
+          </div>
+          <p data-reveal>Mesa, aniversário ou confraternização: preencha aqui e a gente continua a conversa no WhatsApp.</p>
+          <div class="perk" data-reveal><svg class="ic ic--lg"><use href="#i-cake"/></svg><span>Aniversariante no Garden ganha sobremesa!</span></div>
+          <a class="reserve__wa" href="https://wa.me/5581979003779" target="_blank" rel="noopener" data-reveal><svg class="ic"><use href="#i-whatsapp"/></svg>(81) 97900-3779</a>
+        </div>
+
+        <form class="form-card" novalidate data-reveal>
+          <div class="field field--full">
+            <label for="f-nome">Seu nome</label>
+            <input id="f-nome" name="nome" type="text" autocomplete="name" placeholder="Como devemos te chamar?" required>
+            <span class="field__error" id="f-nome-err" role="alert"></span>
+          </div>
+          <div class="field">
+            <label for="f-tipo">Tipo de reserva</label>
+            <div class="select"><select id="f-tipo" name="tipo">
+              <option>Mesa</option><option>Aniversário</option><option>Confraternização</option><option>Evento</option>
+            </select></div>
+          </div>
+          <div class="field">
+            <label for="f-pessoas">Pessoas</label>
+            <div class="select"><select id="f-pessoas" name="pessoas">
+              <option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>8</option><option>10</option><option>15+</option>
+            </select></div>
+          </div>
+          <fieldset class="field field--full">
+            <legend>Dia</legend>
+            <div class="chips">
+              <label class="chip"><input type="radio" name="dia" value="Hoje"><span>Hoje</span></label>
+              <label class="chip"><input type="radio" name="dia" value="Amanhã"><span>Amanhã</span></label>
+              <label class="chip"><input type="radio" name="dia" value="Sábado" checked><span>Sábado</span></label>
+              <label class="chip"><input type="radio" name="dia" value="Domingo"><span>Domingo</span></label>
+              <label class="chip"><input type="radio" name="dia" value="outra"><span>Outra data</span></label>
+            </div>
+            <input class="date-input" type="date" name="data" aria-label="Escolha a data" hidden>
+          </fieldset>
+          <fieldset class="field field--full">
+            <legend>Horário <span class="hint" title="Abrimos todos os dias, das 15h às 22h"><svg class="ic"><use href="#i-info"/></svg><span>Aberto das 15h às 22h</span></span></legend>
+            <div class="chips">
+              <label class="chip"><input type="radio" name="hora" value="15h"><span>15h</span></label>
+              <label class="chip"><input type="radio" name="hora" value="17h"><span>17h</span></label>
+              <label class="chip"><input type="radio" name="hora" value="19h" checked><span>19h</span></label>
+              <label class="chip"><input type="radio" name="hora" value="20h"><span>20h</span></label>
+              <label class="chip"><input type="radio" name="hora" value="21h"><span>21h</span></label>
+            </div>
+          </fieldset>
+          <label class="check field--full">
+            <input type="checkbox" name="aniversario">
+            <span class="check__box" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span><strong>É aniversário</strong><small>Aniversariante no Garden ganha sobremesa!</small></span>
+          </label>
+          <div class="field field--full">
+            <label for="f-obs">Observações</label>
+            <textarea id="f-obs" name="obs" rows="3" placeholder="Alguma preferência de mesa?"></textarea>
+          </div>
+          <button class="btn btn--accent btn--lg btn--full field--full" type="submit"><svg class="ic"><use href="#i-whatsapp"/></svg>Continuar no WhatsApp</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ONDE ESTAMOS -->
+    <section class="where" id="onde" aria-labelledby="where-title">
+      <div class="container where__grid">
+        <figure class="where__img" data-clip><img src="assets/img/fachada.webp" alt="Letreiro redondo Garden Café na fachada verde" width="487" height="387" loading="lazy" data-speed="-0.05"></figure>
+        <div class="where__copy">
+          <div class="section-title section-title--left section-title--deep" data-reveal>
+            <span class="eyebrow eyebrow--deep">Onde estamos</span>
+            <h2 id="where-title" data-split>Vem pro Garden</h2>
+            <span class="script-accent">te esperamos</span>
+          </div>
+          <ul class="where__list">
+            <li data-reveal><svg class="ic"><use href="#i-pin"/></svg><span><strong>Rua Doutor Gustavo Pinto, 393</strong>Jardim São Paulo, Recife – PE · CEP 50781-740</span></li>
+            <li data-reveal><svg class="ic"><use href="#i-clock"/></svg><span><strong>Todos os dias, das 15h às 22h</strong><span class="js-open-status-long">Inclusive fins de semana e feriados</span></span></li>
+            <li data-reveal><svg class="ic"><use href="#i-whatsapp"/></svg><span><strong>(81) 97900-3779</strong>Reservas e eventos pelo WhatsApp</span></li>
+          </ul>
+          <div class="where__ctas" data-reveal>
+            <a class="btn btn--cream" href="https://www.google.com/maps/search/?api=1&amp;query=Garden+Caf%C3%A9+Rua+Doutor+Gustavo+Pinto+393+Jardim+S%C3%A3o+Paulo+Recife" target="_blank" rel="noopener"><svg class="ic"><use href="#i-nav"/></svg>Como chegar</a>
+            <a class="btn btn--outline-cream" href="https://wa.me/5581979003779" target="_blank" rel="noopener"><svg class="ic"><use href="#i-whatsapp"/></svg>WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
-  <script src="js/main.js"></script>
+
+  <!-- RODAPÉ -->
+  <footer class="footer">
+    <div class="container footer__grid">
+      <div class="footer__brand">
+        <a class="wordmark wordmark--stacked" href="#inicio" aria-label="Garden Café, voltar ao início">
+          <img src="assets/img/garden-flower-cream-256.webp" alt="" width="52" height="52" loading="lazy">
+          <span>Garden <span>Café</span></span>
+        </a>
+        <p class="footer__tag">Boa comida, boas histórias<br>e grandes encontros.</p>
+      </div>
+      <div class="footer__col">
+        <span class="footer__title">Onde estamos</span>
+        <p><svg class="ic"><use href="#i-pin"/></svg>Rua Doutor Gustavo Pinto, 393 · Jardim São Paulo, Recife – PE</p>
+        <p><svg class="ic"><use href="#i-clock"/></svg>Todos os dias, das 15h às 22h</p>
+      </div>
+      <div class="footer__col">
+        <span class="footer__title">Fale com a gente</span>
+        <p><svg class="ic"><use href="#i-whatsapp"/></svg>WhatsApp (81) 97900-3779</p>
+        <p><svg class="ic"><use href="#i-instagram"/></svg>@gardencafepe</p>
+        <div class="footer__social">
+          <a class="icon-btn" href="https://www.instagram.com/gardencafepe/" target="_blank" rel="noopener" aria-label="Instagram"><svg class="ic"><use href="#i-instagram"/></svg></a>
+          <a class="icon-btn" href="https://www.facebook.com/gardencaferecife" target="_blank" rel="noopener" aria-label="Facebook"><svg class="ic"><use href="#i-facebook"/></svg></a>
+          <a class="icon-btn" href="https://wa.me/5581979003779" target="_blank" rel="noopener" aria-label="WhatsApp"><svg class="ic"><use href="#i-whatsapp"/></svg></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__big" aria-hidden="true"><span data-big>Garden Café</span></div>
+    <div class="footer__bottom">Todo dia, uma nova experiência.</div>
+  </footer>
+
+  <!-- Barra fixa de reserva no celular -->
+  <div class="mobile-cta" aria-hidden="true">
+    <a class="btn btn--accent btn--full" href="#reservas" tabindex="-1"><svg class="ic"><use href="#i-whatsapp"/></svg>Reservar mesa</a>
+    <a class="icon-btn icon-btn--solid" href="#cardapio" tabindex="-1" aria-label="Ver cardápio"><svg class="ic"><use href="#i-coffee"/></svg></a>
+  </div>
+
+  <!-- Detalhe do prato -->
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" hidden>
+    <div class="dialog__scrim" data-close></div>
+    <div class="dialog__card">
+      <button class="dialog__close icon-btn" type="button" aria-label="Fechar" data-close><svg class="ic"><use href="#i-x"/></svg></button>
+      <div class="dialog__img"><img src="" alt="" width="400" height="400"></div>
+      <div class="dialog__body">
+        <span class="eyebrow eyebrow--accent">Do cardápio</span>
+        <h3 id="dialog-title"></h3>
+        <p class="dialog__desc"></p>
+        <span class="dialog__price"></span>
+        <div class="dialog__ctas">
+          <button class="btn btn--ghost" type="button" data-close>Fechar</button>
+          <a class="btn btn--accent" href="#reservas" data-close-go><svg class="ic"><use href="#i-whatsapp"/></svg>Reservar mesa</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Aviso -->
+  <div class="toast" role="status" aria-live="polite" hidden>
+    <span class="toast__icon"><svg class="ic"><use href="#i-check"/></svg></span>
+    <span><strong class="toast__title">Reserva pronta</strong><span class="toast__msg">Abrindo o WhatsApp do Garden…</span></span>
+  </div>
+
+  <script src="js/menu-data.js" defer></script>
+  <script src="js/vendor/gsap.min.js" defer></script>
+  <script src="js/vendor/ScrollTrigger.min.js" defer></script>
+  <script src="js/vendor/lenis.min.js" defer></script>
+  <script src="js/main.js" defer></script>
 </body>
 </html>

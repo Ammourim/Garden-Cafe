@@ -34,6 +34,7 @@ A aba "Instruções" explica tudo para quem vai editar.
 - Se a planilha não responder, o site usa o conteúdo padrão de `js/menu-data.js` e do `index.html`.
 - Para usar outra planilha, troque só a constante `GARDEN_SHEET_URL` em `js/sheet-content.js`.
 - Links de fotos do Google Drive são convertidos para link direto automaticamente.
+- Cardápio: a coluna "Imagem" da aba Cardápio define a foto de cada item. No computador, a foto ao lado da lista troca ao passar o mouse no item; no celular, o item mostra uma miniatura e abre a foto ao tocar. Sem foto, vale a foto da categoria (aba Categorias).
 
 ## Como abrir a página localmente
 

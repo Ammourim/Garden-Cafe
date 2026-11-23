@@ -7,7 +7,7 @@
 
 /* Link da planilha. Para trocar de planilha, cole aqui o link dela
    (a planilha precisa estar compartilhada como "Qualquer pessoa com o link: Leitor"). */
-var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1eW5U0vxoKb55iv8mbDSVy7ySJPkYn2rrH31pfQhzKd8/edit';
+var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1NtZeOmPjTaGC88BGaNR-E2PAjkM5fF6hFjpAHAPLTj4/edit';
 
 (function () {
   'use strict';

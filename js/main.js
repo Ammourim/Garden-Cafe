@@ -896,8 +896,7 @@
   // Desktop: parallax mais rico
   mm.add('(min-width: 861px)', function () {
     var hero = gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.8 } });
-    hero.to('[data-plate="main"] img', { scale: 1.12, ease: 'none' }, 0)
-      .to('[data-plate="main"]', { yPercent: 18, rotate: 10, ease: 'none' }, 0)
+    hero.to('[data-plate="main"]', { yPercent: 18, rotate: 10, ease: 'none' }, 0)
       .to('[data-plate="side"]', { yPercent: -40, rotate: -12, ease: 'none' }, 0)
       .to('[data-plate="tiny"]', { yPercent: -90, ease: 'none' }, 0)
       .to('.hero__copy', { yPercent: 14, autoAlpha: 0.2, ease: 'none' }, 0);

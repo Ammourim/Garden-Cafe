@@ -35,9 +35,15 @@
     return h;
   }
 
+  // Durante a rolagem por link o cabeçalho fica visível, para o destino
+  // não parar com uma faixa vazia no topo
+  var headerLockUntil = 0;
   function scrollToTarget(target) {
     if (!target) return;
     var extra = 0;
+    headerLockUntil = Date.now() + 1700;
+    var hd = document.querySelector('.header');
+    if (hd) { hd.classList.remove('is-hidden'); document.body.classList.remove('header-hidden'); }
     if (lenis) {
       lenis.scrollTo(target, { offset: -headerOffset() + extra, duration: 1.4 });
     } else {
@@ -397,13 +403,14 @@
   var ticking = false;
   var heroEl = $('.hero');
   var reserveEl = $('#reservas');
+  var menuEl = $('#cardapio');
   var footerEl = $('.footer');
 
   function onScroll() {
     var y = window.pageYOffset;
     var down = y > lastY;
     var past = y > (heroEl ? heroEl.offsetHeight * 0.6 : 400);
-    if (!drawer.classList.contains('is-open')) {
+    if (!drawer.classList.contains('is-open') && Date.now() > headerLockUntil) {
       var hide = down && y > 160 && Math.abs(y - lastY) > 2;
       if (hide !== header.classList.contains('is-hidden') && Math.abs(y - lastY) > 2) {
         header.classList.toggle('is-hidden', hide);
@@ -417,7 +424,10 @@
       var fr = footerEl.getBoundingClientRect();
       var inReserve = rr.top < vh * 0.7 && rr.bottom > vh * 0.3;
       var inFooter = fr.top < vh;
-      var show = past && !inReserve && !inFooter;
+      // Dentro do cardápio a barra sairia da frente dos itens e repetiria o botão "Cardápio"
+      var mr = menuEl ? menuEl.getBoundingClientRect() : null;
+      var inMenu = mr ? (mr.top < vh * 0.6 && mr.bottom > vh * 0.4) : false;
+      var show = past && !inReserve && !inFooter && !inMenu;
       mobileCta.classList.toggle('is-visible', show);
       $$('a', mobileCta).forEach(function (a) { a.tabIndex = show ? 0 : -1; });
       mobileCta.setAttribute('aria-hidden', String(!show));
@@ -803,11 +813,11 @@
         if (lenis) lenis.start();
       }
     });
-    itl.fromTo('.intro__flower', { scale: 0.4, rotate: -120, autoAlpha: 0 }, { scale: 1, rotate: 0, autoAlpha: 1, duration: 1.1, ease: EASE })
-      .fromTo('.intro__word', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.8, ease: EASE }, 0.35)
-      .to('.intro__inner', { autoAlpha: 0, y: -20, duration: 0.5, ease: 'power2.in' }, 1.35)
-      .to(intro, { clipPath: 'inset(0 0 100% 0)', duration: 0.9, ease: 'expo.inOut' }, 1.6)
-      .add(heroIn(), 1.85);
+    itl.fromTo('.intro__flower', { scale: 0.4, rotate: -120, autoAlpha: 0 }, { scale: 1, rotate: 0, autoAlpha: 1, duration: 0.8, ease: EASE })
+      .fromTo('.intro__word', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: EASE }, 0.2)
+      .to('.intro__inner', { autoAlpha: 0, y: -20, duration: 0.35, ease: 'power2.in' }, 0.85)
+      .to(intro, { clipPath: 'inset(0 0 100% 0)', duration: 0.7, ease: 'expo.inOut' }, 1.0)
+      .add(heroIn(), 1.15);
   } else {
     heroIn(0.1);
   }

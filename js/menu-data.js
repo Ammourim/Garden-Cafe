@@ -2,7 +2,8 @@
  * Cardápio do Garden Café.
  * Fonte: PDF do cardápio (link da bio do Instagram), transcrito em
  * system-design/instagram-garden-cafe/README.md (22/11/2026).
- * Para editar um preço, altere o número em "p". Itens com variações usam "v".
+ * Conteúdo padrão: o site usa a planilha do Google (js/sheet-content.js) e só cai aqui se ela não carregar.
+ * "p" = preço, "v" = variações, "b" = selo, "img" = foto do item (sem foto, usa a da categoria).
  */
 window.GARDEN_INFO = {
   address: 'Rua Doutor Gustavo Pinto, 393',
@@ -33,7 +34,7 @@ window.GARDEN_MENU = [
       { n: 'Zé Lopes', d: 'Queijo coalho coberto com charque na manteiga de garrafa', p: 23 },
       { n: 'Ladeira de Olinda', d: 'Massa com verduras, coentro, cebola e tomate, recheio de calabresa', p: 19 },
       { n: 'Nena Queiroga', d: 'Queijo muçarela, acompanha guisado de costela, chips de batata-doce e ovo frito', p: 33 },
-      { n: 'Cabeleira do Zezé', d: 'Doce de leite, queijo manteiga e banana caramelizada, coberto com doce de leite e fios de casca de banana frita', p: 29 }
+      { n: 'Cabeleira do Zezé', d: 'Doce de leite, queijo manteiga e banana caramelizada, coberto com doce de leite e fios de casca de banana frita', p: 29, img: 'cuscuz-doce' }
     ]
   },
   {
@@ -204,7 +205,7 @@ window.GARDEN_MENU = [
     id: 'salgados', label: 'Salgados', img: 'quiche-camarao', cap: 'Quiche de camarão',
     items: [
       { n: 'Quiche de frango e queijo', d: '', p: 17 },
-      { n: 'Quiche de camarão', d: 'Massa delicada, recheio caprichado', p: 20 },
+      { n: 'Quiche de camarão', d: 'Massa delicada, recheio caprichado', p: 20, img: 'quiche-camarao' },
       { n: 'Quiche de carne de charque', d: '', p: 17 },
       { n: 'Quiche de queijo do reino', d: '', p: 20 },
       { n: 'Pão de queijo', d: '6 unidades', p: 14 },
@@ -220,7 +221,7 @@ window.GARDEN_MENU = [
     groups: [
       {
         t: 'Sobremesas', items: [
-          { n: 'Maria Bonita', d: 'Torrada de bolo de rolo, sorvete de nata goiaba e creme de queijo do reino', p: 23, b: 'Favorita' },
+          { n: 'Maria Bonita', d: 'Torrada de bolo de rolo, sorvete de nata goiaba e creme de queijo do reino', p: 23, b: 'Favorita', img: 'maria-bonita' },
           { n: 'Cocada Ciranda', d: 'Cocada cremosa com sorvete de coco e coco queimado', p: 20 },
           { n: 'Petit gâteau', d: '', p: 25 },
           { n: 'Mini cartola tradicional', d: '', p: 15 },
@@ -234,7 +235,7 @@ window.GARDEN_MENU = [
       },
       {
         t: 'Doces', items: [
-          { n: 'Bolo de rolo', d: 'Tradição pernambucana', p: 15 },
+          { n: 'Bolo de rolo', d: 'Tradição pernambucana', p: 15, img: 'bolo-de-rolo' },
           { n: 'Bolo de cenoura com calda de chocolate', d: 'Fatia', p: 15 },
           { n: 'Bolo caseiro do dia', d: 'Fatia', p: 15 },
           { n: 'Fatia torta doce majestade', d: '', p: 22 },

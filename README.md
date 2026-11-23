@@ -7,7 +7,8 @@ Landing page estática do GARDEN (HTML, CSS e JavaScript puros).
 ```
 index.html          Página principal (todas as seções do site)
 css/style.css       Estilos, com os tokens do design system Garden Café
-js/menu-data.js     Cardápio completo, endereço, horário e WhatsApp (edite preços aqui)
+js/menu-data.js     Cardápio padrão, endereço, horário e WhatsApp (usado se a planilha não carregar)
+js/sheet-content.js Lê a planilha do Google com o conteúdo do site (link na constante GARDEN_SHEET_URL)
 js/main.js          Animações, cardápio interativo, menu mobile e reserva pelo WhatsApp
 js/vendor/          GSAP 3.12.5, ScrollTrigger e Lenis 1.1.13 (animações e rolagem suave)
 assets/img/         Fotos, logo da flor e ícones do site
@@ -19,6 +20,20 @@ system-design/      Levantamento do Instagram (fonte do conteúdo real)
 - Rolagem suave (Lenis) só em computadores com mouse; no celular a rolagem é a nativa.
 - Quem ativa "reduzir movimento" no sistema vê o site completo, sem animações.
 - O card do show AdriaNey some sozinho depois de 28/11/2026 e dá lugar a um aviso de próximos eventos (atributo `data-until` em `index.html`).
+
+## Conteúdo pela planilha do Google
+
+O dono do café atualiza o site sem mexer no código, pela planilha
+[Garden Café · Conteúdo do site](https://docs.google.com/spreadsheets/d/1eW5U0vxoKb55iv8mbDSVy7ySJPkYn2rrH31pfQhzKd8/edit).
+A aba "Instruções" explica tudo para quem vai editar.
+
+- Abas lidas pelo site: Cardápio, Categorias, Destaques, Eventos, Sugestão do dia e Promoções.
+- O site lê cada aba como CSV (endpoint `gviz` do Google) ao abrir a página. A planilha precisa estar
+  compartilhada como "Qualquer pessoa com o link: Leitor".
+- A última versão lida fica salva no navegador do visitante, então a próxima visita já abre com ela.
+- Se a planilha não responder, o site usa o conteúdo padrão de `js/menu-data.js` e do `index.html`.
+- Para usar outra planilha, troque só a constante `GARDEN_SHEET_URL` em `js/sheet-content.js`.
+- Links de fotos do Google Drive são convertidos para link direto automaticamente.
 
 ## Como abrir a página localmente
 

@@ -135,16 +135,16 @@ figure{margin:0}
    Abertura
    -------------------------------------------------------------------------- */
 .intro{display:none}
-.js:not(.reduced):not(.no-intro) .intro{display:grid;position:fixed;inset:0;z-index:100;place-items:center;background:var(--mata-900)}
+.js:not(.reduced):not(.no-intro) .intro{display:grid;position:fixed;inset:0;z-index:100;place-items:center;background:var(--creme-100)}
 .intro__inner{display:flex;flex-direction:column;align-items:center;gap:18px}
 .intro__flower{width:112px;height:112px}
-.intro__word{font:400 44px/1 var(--font-script);color:var(--creme-100);display:inline-flex;gap:.25em}
-.intro__word span{color:var(--terracota-300)}
+.intro__word{font:400 48px/.9 var(--font-script);color:var(--oliva-700);display:inline-flex;flex-direction:column;align-items:flex-start}
+.intro__word span{padding-left:.6em}
 
 /* --------------------------------------------------------------------------
    Cabeçalho
    -------------------------------------------------------------------------- */
-.header{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(21,40,28,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border-on-deep);transition:transform .5s var(--ease-out),background-color var(--dur-slow)}
+.header{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(251,246,238,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border-subtle);box-shadow:0 6px 18px -14px rgba(58,32,11,.35);transition:transform .5s var(--ease-out),background-color var(--dur-slow)}
 .header.is-hidden{transform:translateY(-100%)}
 .header__bar{height:var(--header-h);display:flex;align-items:center;gap:32px}
 .wordmark{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--creme-100)}
@@ -152,14 +152,19 @@ figure{margin:0}
 .wordmark img{width:34px;height:34px;transition:transform .8s var(--ease-out)}
 .wordmark:hover img{transform:rotate(-40deg)}
 .wordmark > span{font:400 26px/1 var(--font-script)}
+.wordmark--logo{min-height:44px;gap:10px;color:var(--oliva-700)}
+.wordmark--logo:hover{color:var(--oliva-700)}
+.wordmark--logo img{width:40px;height:40px}
+.wordmark--logo > span{display:inline-flex;flex-direction:column;font-size:23px;line-height:.86}
+.wordmark--logo > span span{padding-left:.55em}
 .nav{display:flex;gap:28px;margin-left:auto}
-.nav a{position:relative;font:600 14px/1 var(--font-sans);letter-spacing:.04em;color:var(--salvia-300);text-decoration:none;padding:8px 0;transition:color var(--dur-base)}
-.nav a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--terracota-400);transform:scaleX(0);transform-origin:right;transition:transform var(--dur-slow) var(--ease-out)}
-.nav a:hover,.nav a.is-active{color:var(--creme-100)}
+.nav a{position:relative;font:600 14px/1 var(--font-sans);letter-spacing:.04em;color:var(--cafe-700);text-decoration:none;padding:8px 0;transition:color var(--dur-base)}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--terracota-500);transform:scaleX(0);transform-origin:right;transition:transform var(--dur-slow) var(--ease-out)}
+.nav a:hover,.nav a.is-active{color:var(--cafe-900)}
 .nav a:hover::after,.nav a.is-active::after{transform:scaleX(1);transform-origin:left}
 
-.burger{display:none;margin-left:auto;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border-on-deep);background:transparent;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
-.burger span{position:absolute;left:13px;right:13px;height:1.5px;background:var(--creme-100);border-radius:2px;transition:transform var(--dur-slow) var(--ease-out),top var(--dur-slow) var(--ease-out)}
+.burger{display:none;margin-left:auto;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border-subtle);background:transparent;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
+.burger span{position:absolute;left:13px;right:13px;height:1.5px;background:var(--cafe-900);border-radius:2px;transition:transform var(--dur-slow) var(--ease-out),top var(--dur-slow) var(--ease-out)}
 .burger span:first-child{top:17px}
 .burger span:last-child{top:25px}
 .burger[aria-expanded="true"] span:first-child{top:21px;transform:rotate(45deg)}
@@ -175,7 +180,7 @@ figure{margin:0}
 @media (max-width: 420px) {
   .header__cta{display:none}
   .burger{margin-left:auto !important}
-  .wordmark > span{font-size:24px}
+  .wordmark--logo > span{font-size:22px}
 }
 
 /* Menu mobile */

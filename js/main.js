@@ -13,6 +13,12 @@
 
   var INFO = window.GARDEN_INFO || {};
   var MENU = window.GARDEN_MENU || [];
+  // Conteúdo da planilha do Google (js/sheet-content.js). Se houver uma cópia
+  // salva da última visita, ela já entra agora; a versão nova chega depois.
+  var Sheet = window.GardenSheet || null;
+  var sheetContent = Sheet ? Sheet.cached() : null;
+  if (sheetContent && sheetContent.menu) MENU = sheetContent.menu;
+  var animReady = false;
   var reduced = doc.classList.contains('reduced');
   var hasGsap = !!(window.gsap && window.ScrollTrigger);
   var isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
@@ -40,7 +46,31 @@
     }
   }
 
-  function fmt(p) { return 'R$ ' + String(p).replace('.', ','); }
+  function fmt(p) {
+    if (typeof p !== 'number') return String(p);
+    return 'R$ ' + (p % 1 ? p.toFixed(2) : String(p)).replace('.', ',');
+  }
+
+  function priceText(p) {
+    if (p === null || p === undefined || p === '') return '';
+    return typeof p === 'number' ? fmt(p) : String(p);
+  }
+
+  // Nome de arquivo da pasta assets/img, link do Google Drive ou link de imagem
+  function imgUrl(src, w) {
+    if (Sheet) return Sheet.imageUrl(src, w);
+    return /^https?:/.test(src) ? src : 'assets/img/' + src + '.webp';
+  }
+
+  function isoDate(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  var MONTHS = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  function longDate(iso) {
+    var p = iso.split('-');
+    return parseInt(p[2], 10) + ' de ' + MONTHS[parseInt(p[1], 10) - 1];
+  }
 
   function recifeNow() {
     // Horário de Recife (UTC-3, sem horário de verão)
@@ -80,17 +110,20 @@
   /* ------------------------------------------------------------------------
      Contagem de itens do cardápio
      ------------------------------------------------------------------------ */
-  var totalItems = 0;
-  MENU.forEach(function (c) {
-    if (c.items) totalItems += c.items.length;
-    (c.groups || []).forEach(function (g) { totalItems += g.items.length; });
-  });
-  var countEl = $('.js-count-items');
-  if (countEl && totalItems) {
-    var rounded = Math.floor(totalItems / 10) * 10;
-    countEl.textContent = rounded + '+';
-    countEl.setAttribute('data-count', rounded);
+  function updateCount() {
+    var totalItems = 0;
+    MENU.forEach(function (c) {
+      if (c.items) totalItems += c.items.length;
+      (c.groups || []).forEach(function (g) { totalItems += g.items.length; });
+    });
+    var countEl = $('.js-count-items');
+    if (countEl && totalItems >= 10) {
+      var rounded = Math.floor(totalItems / 10) * 10;
+      countEl.textContent = rounded + '+';
+      countEl.setAttribute('data-count', rounded);
+    }
   }
+  updateCount();
 
   /* ------------------------------------------------------------------------
      Cardápio: abas, filtro e troca animada
@@ -116,23 +149,32 @@
     });
   }
 
+  var photoItems = [];
+
   function itemHtml(it) {
     var price = '';
     if (typeof it.p === 'number') price = '<span class="menu-item__price">' + fmt(it.p) + '</span>';
+    else if (it.p) price = '<span class="menu-item__price">' + escapeHtml(it.p) + '</span>';
     else if (!it.v) price = '<span class="menu-item__price menu-item__price--na">consulte</span>';
     var vars = it.v ? '<div class="menu-item__vars">' + it.v.map(function (x) {
       return '<span>' + escapeHtml(x[0]) + ' <b>' + fmt(x[1]) + '</b></span>';
     }).join('') + '</div>' : '';
     var badge = it.b ? '<span class="badge badge--novidade">' + escapeHtml(it.b) + '</span>' : '';
     var desc = it.d ? '<span class="menu-item__desc">' + escapeHtml(it.d) + '</span>' : '';
+    var photo = '';
+    if (it.img) {
+      photoItems.push(it);
+      photo = '<button class="menu-item__photo" type="button" data-photo="' + (photoItems.length - 1) + '" aria-label="Ver foto: ' + escapeHtml(it.n) + '">ver foto</button>';
+    }
     return '<div class="menu-item"><div class="menu-item__row"><span class="menu-item__name">' + escapeHtml(it.n) + '</span>' +
-      badge + '<span class="menu-item__fill"></span>' + price + '</div>' + desc + vars + '</div>';
+      badge + photo + '<span class="menu-item__fill"></span>' + price + '</div>' + desc + vars + '</div>';
   }
 
   function renderMenu(animate) {
     var cat = MENU.filter(function (c) { return c.id === currentCat; })[0];
     if (!cat || !listEl) return;
     var cheap = cheapEl && cheapEl.checked;
+    photoItems = [];
     var filter = function (items) { return cheap ? items.filter(function (i) { return itemMinPrice(i) <= 25; }) : items; };
 
     var html = '';
@@ -175,7 +217,7 @@
 
     // Foto lateral (desktop)
     if (photoImg && photoImg.getAttribute('data-src') !== cat.img) {
-      var src = 'assets/img/' + cat.img + '.webp';
+      var src = imgUrl(cat.img, 900);
       photoImg.setAttribute('data-src', cat.img);
       if (hasGsap && !reduced && animate) {
         var frame = photoImg.parentNode;
@@ -194,10 +236,15 @@
     }
   }
 
-  if (tabsEl && MENU.length) {
-    tabsEl.innerHTML = MENU.map(function (c, i) {
-      return '<button class="tab" type="button" role="tab" id="tab-' + c.id + '" aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '" data-cat="' + c.id + '">' + escapeHtml(c.label) + '</button>';
+  function buildTabs() {
+    tabsEl.innerHTML = MENU.map(function (c) {
+      var on = c.id === currentCat;
+      return '<button class="tab" type="button" role="tab" id="tab-' + c.id + '" aria-selected="' + on + '" tabindex="' + (on ? 0 : -1) + '" data-cat="' + c.id + '">' + escapeHtml(c.label) + '</button>';
     }).join('');
+  }
+
+  if (tabsEl && MENU.length) {
+    buildTabs();
 
     var selectTab = function (btn, focus) {
       if (!btn || btn.getAttribute('data-cat') === currentCat) return;
@@ -232,8 +279,16 @@
       if (e.key === 'ArrowLeft') { e.preventDefault(); selectTab(tabs[(i - 1 + tabs.length) % tabs.length], true); }
     });
     if (cheapEl) cheapEl.addEventListener('change', function () { renderMenu(true); });
-    photoImg && photoImg.setAttribute('data-src', MENU[0].img);
+    if (photoImg && !sheetContent) photoImg.setAttribute('data-src', MENU[0].img);
     renderMenu(false);
+    listEl.addEventListener('click', function (e) {
+      var b = e.target.closest('.menu-item__photo');
+      if (!b) return;
+      var it = photoItems[+b.getAttribute('data-photo')];
+      if (!it) return;
+      var pr = typeof it.p === 'number' ? fmt(it.p) : (it.v ? it.v.map(function (x) { return x[0] + ' ' + fmt(x[1]); }).join(' · ') : (it.p || ''));
+      openDialog({ name: it.n, desc: it.d, price: pr, img: it.img });
+    });
   }
 
   /* ------------------------------------------------------------------------
@@ -346,7 +401,7 @@
   function openDialog(data) {
     if (!dialog) return;
     lastFocus = document.activeElement;
-    $('.dialog__img img', dialog).src = 'assets/img/' + data.img + '.webp';
+    $('.dialog__img img', dialog).src = imgUrl(data.img, 1200);
     $('.dialog__img img', dialog).alt = data.name;
     $('#dialog-title').textContent = data.name;
     $('.dialog__desc', dialog).textContent = data.desc;
@@ -364,10 +419,11 @@
     if (lenis) lenis.start();
     setTimeout(function () { dialog.hidden = true; if (lastFocus) lastFocus.focus(); }, reduced ? 0 : 380);
   }
-  $$('.dish').forEach(function (d) {
-    $('.dish__btn', d).addEventListener('click', function () {
-      try { openDialog(JSON.parse(d.getAttribute('data-dish'))); } catch (e) {}
-    });
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.dish__btn');
+    if (!btn) return;
+    var d = btn.closest('.dish');
+    try { openDialog(JSON.parse(d.getAttribute('data-dish'))); } catch (err) {}
   });
   if (dialog) {
     dialog.addEventListener('click', function (e) {
@@ -405,8 +461,7 @@
   if (form) {
     var dateInput = $('.date-input', form);
     var today = recifeNow();
-    var iso = function (d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
-    dateInput.min = iso(today);
+    dateInput.min = isoDate(today);
     $$('input[name="dia"]', form).forEach(function (r) {
       r.addEventListener('change', function () {
         dateInput.hidden = r.value !== 'outra' || !r.checked;
@@ -448,6 +503,138 @@
       var url = 'https://wa.me/' + (INFO.whatsapp || '5581979003779') + '?text=' + encodeURIComponent(msg);
       showToast('Reserva pronta', 'Abrindo o WhatsApp do Garden…');
       setTimeout(function () { window.open(url, '_blank', 'noopener'); }, 450);
+    });
+  }
+
+  /* ------------------------------------------------------------------------
+     Conteúdo da planilha: destaques, eventos, sugestão do dia e promoções
+     ------------------------------------------------------------------------ */
+  var appliedJson = sheetContent ? JSON.stringify(sheetContent) : null;
+  var dailyCard = $('.daily-card');
+  var dailyDefault = dailyCard ? dailyCard.innerHTML : '';
+  var bdayDefault = {};
+  $$('.js-bday').forEach(function (el, i) { bdayDefault[i] = el.textContent; });
+
+  // Elementos criados depois que as animações já foram montadas
+  function revealNew(els) {
+    if (!els.length || !animReady || !hasGsap || reduced) return;
+    gsap.fromTo(els, { autoAlpha: 0, y: 30 }, {
+      autoAlpha: 1, y: 0, duration: 1, ease: EASE, stagger: 0.08,
+      scrollTrigger: { trigger: els[0], start: 'top 92%', once: true }
+    });
+  }
+
+  function renderHighlights(list, initial) {
+    var rail = $('.delights__rail');
+    if (!rail || !list || !list.length) return;
+    rail.innerHTML = list.map(function (d) {
+      var price = priceText(d.price);
+      var data = { name: d.name, desc: d.desc || d.short || '', price: price, img: d.img || 'maria-bonita' };
+      return '<article class="dish" role="listitem" data-dish="' + escapeHtml(JSON.stringify(data)) + '">' +
+        '<button class="dish__btn" type="button" aria-label="Ver detalhes: ' + escapeHtml(d.name) + '">' +
+        '<span class="dish__img"><img src="' + escapeHtml(imgUrl(data.img, 700)) + '" alt="' + escapeHtml(d.name) + '" width="600" height="600" loading="lazy"></span>' +
+        '<span class="dish__body"><span class="badge badge--plate">' + escapeHtml(d.name) + '</span>' +
+        (d.short ? '<span class="muted">' + escapeHtml(d.short) + '</span>' : '') +
+        (price ? '<span class="dish__price">' + escapeHtml(price) + '</span>' : '') +
+        '</span></button></article>';
+    }).join('');
+    if (!initial) revealNew($$('.dish', rail));
+  }
+
+  function renderEvents(list, initial) {
+    var wrap = $('.events__list');
+    if (!wrap || !list) return;
+    var today = isoDate(recifeNow());
+    var upcoming = list.filter(function (ev) { return !ev.date || ev.date >= today; })
+      .sort(function (a, b) { return (a.date || '9999') < (b.date || '9999') ? -1 : 1; });
+    var attrs = initial ? ' data-reveal' : '';
+    var phone = INFO.eventsPhone || '5581986059740';
+    var phoneLabel = INFO.eventsPhoneLabel || '(81) 98605-9740';
+    var html = upcoming.map(function (ev) {
+      var meta = '';
+      if (ev.date) meta += '<li><svg class="ic"><use href="#i-calendar"/></svg>' + longDate(ev.date) + '</li>';
+      if (ev.time) meta += '<li><svg class="ic"><use href="#i-clock"/></svg>' + escapeHtml(ev.time) + '</li>';
+      if (priceText(ev.price)) {
+        var ep = typeof ev.price === 'number' ? 'R$ ' + ev.price.toFixed(2).replace('.', ',') : ev.price;
+        meta += '<li><svg class="ic"><use href="#i-ticket"/></svg>' + escapeHtml(ep) + '</li>';
+      }
+      return '<article class="event' + (ev.img ? '' : ' event--noimg') + '"' + attrs + '>' +
+        (ev.img ? '<div class="event__img"' + (initial ? ' data-clip' : '') + '><img src="' + escapeHtml(imgUrl(ev.img, 900)) + '" alt="' + escapeHtml(ev.title) + '" width="600" height="600" loading="lazy"></div>' : '') +
+        '<div class="event__body">' +
+        (ev.type ? '<span class="badge badge--novidade">' + escapeHtml(ev.type) + '</span>' : '') +
+        '<h3>' + escapeHtml(ev.title) + '</h3>' +
+        (ev.desc ? '<p>' + escapeHtml(ev.desc) + '</p>' : '') +
+        (meta ? '<ul class="event__meta">' + meta + '</ul>' : '') +
+        '<div class="event__ctas">' +
+        '<a class="btn btn--accent" href="#reservas" data-reserve="Evento"><svg class="ic"><use href="#i-whatsapp"/></svg>Faça sua reserva</a>' +
+        '<a class="btn btn--outline-cream" href="tel:+' + escapeHtml(phone) + '"><svg class="ic"><use href="#i-phone"/></svg>' + escapeHtml(phoneLabel) + '</a>' +
+        '</div></div></article>';
+    }).join('');
+    var empty = $('.event--empty');
+    $$('.event:not(.event--empty)', wrap).forEach(function (el) { el.remove(); });
+    if (empty) {
+      empty.insertAdjacentHTML('beforebegin', html);
+      empty.hidden = upcoming.length > 0;
+    } else {
+      wrap.insertAdjacentHTML('afterbegin', html);
+    }
+    if (!initial) revealNew($$('.event:not([hidden])', wrap));
+  }
+
+  function renderDaily(list) {
+    if (!dailyCard || !list) return;
+    var today = isoDate(recifeNow());
+    var d = list.filter(function (x) { return !x.date || x.date === today; })[0];
+    dailyCard.innerHTML = dailyDefault;
+    if (!d) return;
+    var img = $('.daily-card__img img', dailyCard);
+    if (img && d.img) { img.src = imgUrl(d.img, 800); img.alt = d.name; }
+    $('.eyebrow', dailyCard).textContent = 'Sugestão de hoje';
+    $('.daily-card__title', dailyCard).textContent = d.name;
+    var muted = $('.muted', dailyCard);
+    muted.textContent = d.desc || 'Preço especial só hoje.';
+    var price = priceText(d.price);
+    if (price) muted.insertAdjacentHTML('afterend', '<span class="dish__price">' + escapeHtml(price) + '</span>');
+    var arrow = $('.link-arrow', dailyCard);
+    if (arrow) arrow.innerHTML = 'Ver nos stories <svg class="ic"><use href="#i-arrow-up-right"/></svg>';
+  }
+
+  function renderPromos(promos) {
+    if (!promos) return;
+    var b = promos['aniversario'];
+    if (!b) return;
+    var show = b.show && b.text;
+    $$('.js-bday').forEach(function (el, i) {
+      el.textContent = show ? b.text : (el.getAttribute('data-off') || bdayDefault[i]);
+    });
+    $$('.js-bday-off').forEach(function (el) { el.hidden = !show; });
+  }
+
+  function applyContent(c, initial) {
+    if (!c) return;
+    if (c.menu && c.menu.length && !initial) {
+      MENU = c.menu;
+      if (!MENU.some(function (x) { return x.id === currentCat; })) currentCat = MENU[0].id;
+      if (tabsEl) { buildTabs(); renderMenu(false); }
+      updateCount();
+    }
+    renderHighlights(c.highlights, initial);
+    renderEvents(c.events, initial);
+    renderDaily(c.daily);
+    renderPromos(c.promos);
+    if (!initial && hasGsap) ScrollTrigger.refresh();
+  }
+
+  // 1) Cópia salva da última visita entra antes das animações
+  if (sheetContent) applyContent(sheetContent, true);
+  // 2) Versão nova da planilha: só redesenha se algo mudou
+  if (Sheet) {
+    Sheet.fetch().then(function (fresh) {
+      if (!fresh) return;
+      var json = JSON.stringify(fresh);
+      if (json === appliedJson) return;
+      appliedJson = json;
+      applyContent(fresh, false);
     });
   }
 
@@ -662,6 +849,8 @@
     hero.to('[data-plate="main"]', { yPercent: 12, rotate: 8, ease: 'none' }, 0)
       .to('[data-plate="side"]', { yPercent: -18, ease: 'none' }, 0);
   });
+
+  animReady = true;
 
   // Recalcula posições depois que as fontes carregam
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { ScrollTrigger.refresh(); });

@@ -288,6 +288,7 @@
           <span class="script-accent">boas histórias</span>
         </div>
 
+        <div class="events__list">
         <article class="event" data-until="2026-11-29" data-reveal>
           <div class="event__img" data-clip><img src="assets/img/evento-adrianey.webp" alt="Cartaz do show AdriaNey no Garden Café, 28 de novembro, 20h" width="395" height="489" loading="lazy"></div>
           <div class="event__body">
@@ -313,12 +314,13 @@
             <div class="event__ctas"><a class="btn btn--cream" href="https://www.instagram.com/gardencafepe/" target="_blank" rel="noopener"><svg class="ic"><use href="#i-instagram"/></svg>@gardencafepe</a></div>
           </div>
         </article>
+        </div>
 
         <div class="events__types">
           <a class="type-card" href="#reservas" data-reserve="Aniversário" data-reveal>
             <svg class="ic ic--lg"><use href="#i-cake"/></svg>
             <span class="type-card__title">Aniversários</span>
-            <span>Aniversariante no Garden ganha sobremesa!</span>
+            <span class="js-bday" data-off="Comemore o seu aniversário com a gente.">Aniversariante no Garden ganha sobremesa!</span>
             <span class="link-arrow">Reservar <svg class="ic"><use href="#i-arrow-right"/></svg></span>
           </a>
           <a class="type-card" href="#reservas" data-reserve="Confraternização" data-reveal>
@@ -341,7 +343,7 @@
             <span class="script-accent">para eventos</span>
           </div>
           <p data-reveal>Mesa, aniversário ou confraternização: preencha aqui e a gente continua a conversa no WhatsApp.</p>
-          <div class="perk" data-reveal><svg class="ic ic--lg"><use href="#i-cake"/></svg><span>Aniversariante no Garden ganha sobremesa!</span></div>
+          <div class="perk js-bday-off" data-reveal><svg class="ic ic--lg"><use href="#i-cake"/></svg><span class="js-bday">Aniversariante no Garden ganha sobremesa!</span></div>
           <a class="reserve__wa" href="https://wa.me/5581979003779" target="_blank" rel="noopener" data-reveal><svg class="ic"><use href="#i-whatsapp"/></svg>(81) 97900-3779</a>
         </div>
 
@@ -387,7 +389,7 @@
           <label class="check field--full">
             <input type="checkbox" name="aniversario">
             <span class="check__box" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span>
-            <span><strong>É aniversário</strong><small>Aniversariante no Garden ganha sobremesa!</small></span>
+            <span><strong>É aniversário</strong><small class="js-bday js-bday-off">Aniversariante no Garden ganha sobremesa!</small></span>
           </label>
           <div class="field field--full">
             <label for="f-obs">Observações</label>
@@ -484,6 +486,7 @@
   </div>
 
   <script src="js/menu-data.js" defer></script>
+  <script src="js/sheet-content.js" defer></script>
   <script src="js/vendor/gsap.min.js" defer></script>
   <script src="js/vendor/ScrollTrigger.min.js" defer></script>
   <script src="js/vendor/lenis.min.js" defer></script>

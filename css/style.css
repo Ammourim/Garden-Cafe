@@ -587,3 +587,10 @@ figure{margin:0}
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
   .drawer{transition:none}
 }
+
+/* Conteúdo vindo da planilha */
+.events__list{display:grid;gap:20px}
+.event--noimg{grid-template-columns:1fr}
+.menu-item__photo{align-self:center;flex:none;padding:4px 9px;border:1px solid rgba(110,63,21,.3);border-radius:var(--radius-pill);background:transparent;font:700 11px/1 var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--text-accent);cursor:pointer;transition:background var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out)}
+.menu-item__photo:hover,.menu-item__photo:focus-visible{background:var(--text-accent);color:var(--branco)}
+.daily-card .dish__price{margin-top:0}

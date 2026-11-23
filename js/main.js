@@ -449,7 +449,7 @@
         }
       });
     }, { rootMargin: '-45% 0px -50% 0px' });
-    ['cardapio', 'sugestao', 'eventos', 'reservas', 'onde'].forEach(function (id) {
+    ['sugestao', 'cardapio', 'eventos', 'reservas', 'onde'].forEach(function (id) {
       var s = document.getElementById(id); if (s) io.observe(s);
     });
   }
@@ -873,9 +873,9 @@
     manifesto.innerHTML = text.split(/\s+/).map(function (w) {
       return '<span class="word" aria-hidden="true">' + escapeHtml(w) + '</span>';
     }).join(' ');
-    gsap.fromTo($$('.word', manifesto), { opacity: 0.14 }, {
+    gsap.fromTo($$('.word', manifesto), { opacity: 0.35 }, {
       opacity: 1, ease: 'none', stagger: 0.1,
-      scrollTrigger: { trigger: manifesto, start: 'top 80%', end: 'bottom 45%', scrub: 0.6 }
+      scrollTrigger: { trigger: manifesto, start: 'top 85%', end: 'bottom 60%', scrub: 0.6 }
     });
   }
 

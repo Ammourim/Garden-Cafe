@@ -95,8 +95,8 @@
         <span>Garden <span>Café</span></span>
       </a>
       <nav class="nav" aria-label="Principal">
-        <a href="#cardapio">Cardápio</a>
         <a href="#sugestao">Sugestão do dia</a>
+        <a href="#cardapio">Cardápio</a>
         <a href="#eventos">Eventos</a>
         <a href="#reservas">Reservas</a>
         <a href="#onde">Onde estamos</a>
@@ -112,8 +112,8 @@
   <div class="drawer" id="menu-mobile" aria-hidden="true">
     <nav class="drawer__nav" aria-label="Menu">
       <a href="#inicio"><small>01</small>Início</a>
-      <a href="#cardapio"><small>02</small>Cardápio</a>
-      <a href="#sugestao"><small>03</small>Sugestão do dia</a>
+      <a href="#sugestao"><small>02</small>Sugestão do dia</a>
+      <a href="#cardapio"><small>03</small>Cardápio</a>
       <a href="#eventos"><small>04</small>Eventos</a>
       <a href="#reservas"><small>05</small>Reservas</a>
       <a href="#onde"><small>06</small>Onde estamos</a>
@@ -134,7 +134,6 @@
       <svg class="sprig sprig--hero" aria-hidden="true"><use href="#i-sprig"/></svg>
       <div class="container hero__grid">
         <div class="hero__copy">
-          <span class="eyebrow eyebrow--deep" data-hero="fade">Jardim São Paulo · Recife</span>
           <h1 class="hero__title" id="hero-title" data-split>Café e comida <em class="script">arretada.</em></h1>
           <p class="hero__lead" data-hero="fade">Um refúgio em meio à correria do cotidiano de Recife. Cuscuz, tapiocas, caldos, croissants e cafés com sabor de Nordeste.</p>
           <div class="hero__ctas" data-hero="fade">
@@ -164,34 +163,11 @@
       </div>
     </div>
 
-    <!-- SOBRE / MANIFESTO -->
-    <section class="about" id="sobre" aria-labelledby="about-title">
-      <svg class="sprig sprig--about" aria-hidden="true"><use href="#i-sprig"/></svg>
-      <div class="container about__grid">
-        <div class="about__text">
-          <span class="eyebrow" data-reveal>Bem-vindo ao Garden</span>
-          <h2 class="sr-only" id="about-title">Sobre o Garden Café</h2>
-          <p class="manifesto" data-words>Um cantinho feito para desacelerar. Boa comida, boas histórias e grandes encontros, do jeitinho que a gente gosta.</p>
-          <ul class="stats">
-            <li data-reveal><strong>15h<span>–</span>22h</strong><span>todos os dias da semana</span></li>
-            <li data-reveal><strong data-count="0" class="js-count-items">150+</strong><span>itens no cardápio</span></li>
-            <li data-reveal><strong class="script">daqui</strong><span>nomes da cultura pernambucana</span></li>
-          </ul>
-        </div>
-        <div class="about__media">
-          <figure class="frame frame--tall" data-clip><img src="assets/img/maria-bonita.webp" alt="Sobremesa Maria Bonita servida no salão do Garden" width="333" height="460" loading="lazy" data-speed="-0.06"></figure>
-          <figure class="frame frame--short" data-clip><img src="assets/img/reel-fachada.webp" alt="Fachada verde do Garden Café com toldo creme" width="185" height="234" loading="lazy" data-speed="0.06"></figure>
-          <img class="about__badge" src="assets/img/garden-flower-badge-256.webp" alt="" width="120" height="120" loading="lazy" data-spin>
-        </div>
-      </div>
-    </section>
-
     <!-- SUGESTÃO DO DIA -->
     <section class="daily" id="sugestao" aria-labelledby="daily-title">
       <div class="container daily__grid">
         <div class="daily__copy">
-          <span class="badge badge--novidade" data-reveal>Novidade</span>
-          <h2 class="poster" id="daily-title" data-split>Sugestão do dia</h2>
+          <h2 class="poster poster--sm" id="daily-title" data-split>Sugestão do dia</h2>
           <p data-reveal>Todo dia tem um prato com preço especial. Fica de olho, porque quando entra na sugestão, o sabor vem e o preço desce!</p>
         </div>
         <a class="daily-card" href="https://www.instagram.com/stories/gardencafepe/" target="_blank" rel="noopener" data-reveal>
@@ -210,7 +186,6 @@
     <section class="delights" aria-labelledby="delights-title">
       <div class="container">
         <div class="section-title" data-reveal>
-          <span class="eyebrow">Do nosso cardápio</span>
           <h2 id="delights-title" data-split>Delícias do nosso Nordeste</h2>
         </div>
         <div class="delights__rail" role="list">
@@ -242,7 +217,6 @@
       <div class="menu__head">
         <div class="container">
           <div class="section-title section-title--left section-title--deep" data-reveal>
-            <span class="eyebrow eyebrow--deep">Cardápio</span>
             <h2 id="menu-title" data-split>Nosso cardápio</h2>
             <span class="script-accent">com nomes daqui</span>
           </div>
@@ -275,11 +249,31 @@
       <p class="container menu__foot">Preços em reais, conforme o cardápio impresso. Valores e disponibilidade podem mudar: confirme no salão.</p>
     </section>
 
+    <!-- SOBRE / MANIFESTO -->
+    <section class="about" id="sobre" aria-labelledby="about-title">
+      <svg class="sprig sprig--about" aria-hidden="true"><use href="#i-sprig"/></svg>
+      <div class="container about__grid">
+        <div class="about__text">
+          <span class="eyebrow" data-reveal>Bem-vindo ao Garden</span>
+          <h2 class="sr-only" id="about-title">Sobre o Garden Café</h2>
+          <p class="manifesto" data-words>Um cantinho feito para desacelerar. Boa comida, boas histórias e grandes encontros, do jeitinho que a gente gosta.</p>
+          <ul class="stats">
+            <li data-reveal><strong>15h<span>–</span>22h</strong><span>todos os dias da semana</span></li>
+            <li data-reveal><strong data-count="0" class="js-count-items">150+</strong><span>itens no cardápio</span></li>
+          </ul>
+        </div>
+        <div class="about__media">
+          <figure class="frame frame--tall" data-clip><img src="assets/img/maria-bonita.webp" alt="Sobremesa Maria Bonita servida no salão do Garden" width="333" height="460" loading="lazy" data-speed="-0.06"></figure>
+          <figure class="frame frame--short" data-clip><img src="assets/img/reel-fachada.webp" alt="Fachada verde do Garden Café com toldo creme" width="185" height="234" loading="lazy" data-speed="0.06"></figure>
+          <img class="about__badge" src="assets/img/garden-flower-badge-256.webp" alt="" width="120" height="120" loading="lazy" data-spin>
+        </div>
+      </div>
+    </section>
+
     <!-- EVENTOS -->
     <section class="events" id="eventos" aria-labelledby="events-title">
       <div class="container">
         <div class="section-title section-title--left section-title--deep" data-reveal>
-          <span class="eyebrow eyebrow--deep">Agenda</span>
           <h2 id="events-title" data-split>Eventos no Garden</h2>
           <span class="script-accent">boas histórias</span>
         </div>
@@ -334,7 +328,6 @@
       <div class="container reserve__grid">
         <div class="reserve__intro">
           <div class="section-title section-title--left" data-reveal>
-            <span class="eyebrow">Disponibilidade para</span>
             <h2 id="reserve-title" data-split>Reservas</h2>
             <span class="script-accent">mesa, festa ou evento</span>
           </div>
@@ -406,7 +399,6 @@
         <figure class="where__img" data-clip><img src="assets/img/fachada.webp" alt="Letreiro redondo Garden Café na fachada verde" width="487" height="387" loading="lazy" data-speed="-0.05"></figure>
         <div class="where__copy">
           <div class="section-title section-title--left section-title--deep" data-reveal>
-            <span class="eyebrow eyebrow--deep">Onde estamos</span>
             <h2 id="where-title" data-split>Vem pro Garden</h2>
             <span class="script-accent">te esperamos</span>
           </div>

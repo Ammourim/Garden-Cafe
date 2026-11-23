@@ -591,6 +591,13 @@ figure{margin:0}
 /* Conteúdo vindo da planilha */
 .events__list{display:grid;gap:20px}
 .event--noimg{grid-template-columns:1fr}
-.menu-item__photo{align-self:center;flex:none;padding:4px 9px;border:1px solid rgba(110,63,21,.3);border-radius:var(--radius-pill);background:transparent;font:700 11px/1 var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--text-accent);cursor:pointer;transition:background var(--dur-base) var(--ease-out),color var(--dur-base) var(--ease-out)}
-.menu-item__photo:hover,.menu-item__photo:focus-visible{background:var(--text-accent);color:var(--branco)}
+.menu-item{flex-direction:row;align-items:flex-start;gap:14px;cursor:pointer;outline:none}
+.menu-item__main{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.menu-item__name{transition:color var(--dur-base) var(--ease-out)}
+.menu-item:hover .menu-item__name,.menu-item:focus-visible .menu-item__name{color:var(--text-accent)}
+.menu-item:focus-visible{box-shadow:0 0 0 2px var(--text-accent);border-radius:8px}
+.menu-item__thumb{flex:none;width:52px;height:52px;margin-top:2px;border-radius:50%;overflow:hidden;background:var(--creme-200);box-shadow:var(--shadow-sm)}
+.menu-item__thumb img{width:100%;height:100%;object-fit:cover}
+.menu-photo__frame img{will-change:opacity,transform}
+@media (min-width: 861px){.menu-item__thumb{display:none}}
 .daily-card .dish__price{margin-top:0}

@@ -149,7 +149,8 @@
     });
   }
 
-  var photoItems = [];
+  var menuItems = [];
+  var currentCatObj = null;
 
   function itemHtml(it) {
     var price = '';
@@ -161,20 +162,19 @@
     }).join('') + '</div>' : '';
     var badge = it.b ? '<span class="badge badge--novidade">' + escapeHtml(it.b) + '</span>' : '';
     var desc = it.d ? '<span class="menu-item__desc">' + escapeHtml(it.d) + '</span>' : '';
-    var photo = '';
-    if (it.img) {
-      photoItems.push(it);
-      photo = '<button class="menu-item__photo" type="button" data-photo="' + (photoItems.length - 1) + '" aria-label="Ver foto: ' + escapeHtml(it.n) + '">ver foto</button>';
-    }
-    return '<div class="menu-item"><div class="menu-item__row"><span class="menu-item__name">' + escapeHtml(it.n) + '</span>' +
-      badge + photo + '<span class="menu-item__fill"></span>' + price + '</div>' + desc + vars + '</div>';
+    menuItems.push(it);
+    var thumb = it.img ? '<span class="menu-item__thumb" aria-hidden="true"><img src="' + escapeHtml(imgUrl(it.img, 160)) + '" alt="" width="52" height="52" loading="lazy"></span>' : '';
+    return '<div class="menu-item' + (it.img ? ' has-photo' : '') + '" role="button" tabindex="0" data-i="' + (menuItems.length - 1) + '" aria-label="' + escapeHtml(it.n) + ': ver foto e detalhes">' +
+      thumb + '<div class="menu-item__main"><div class="menu-item__row"><span class="menu-item__name">' + escapeHtml(it.n) + '</span>' +
+      badge + '<span class="menu-item__fill"></span>' + price + '</div>' + desc + vars + '</div></div>';
   }
 
   function renderMenu(animate) {
     var cat = MENU.filter(function (c) { return c.id === currentCat; })[0];
     if (!cat || !listEl) return;
     var cheap = cheapEl && cheapEl.checked;
-    photoItems = [];
+    menuItems = [];
+    currentCatObj = cat;
     var filter = function (items) { return cheap ? items.filter(function (i) { return itemMinPrice(i) <= 25; }) : items; };
 
     var html = '';
@@ -215,25 +215,53 @@
       swap();
     }
 
-    // Foto lateral (desktop)
-    if (photoImg && photoImg.getAttribute('data-src') !== cat.img) {
-      var src = imgUrl(cat.img, 900);
-      photoImg.setAttribute('data-src', cat.img);
-      if (hasGsap && !reduced && animate) {
-        var frame = photoImg.parentNode;
-        gsap.to(frame, {
-          clipPath: 'inset(0 0 100% 0)', duration: 0.35, ease: 'power2.in', onComplete: function () {
-            photoImg.src = src;
-            photoCap.textContent = cat.cap;
-            gsap.fromTo(frame, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 0.8, ease: EASE });
-            gsap.fromTo(photoImg, { scale: 1.15 }, { scale: 1, duration: 1.1, ease: EASE });
+    // Foto lateral (desktop): volta para a foto da categoria
+    setMenuPhoto(cat.img, cat.cap, animate ? 'reveal' : null);
+  }
+
+  // Troca a foto lateral. mode: 'reveal' (troca de categoria), 'fade' (item), null (sem animação)
+  var photoToken = 0;
+  function setMenuPhoto(img, cap, mode) {
+    if (!photoImg || !img || photoImg.getAttribute('data-src') === img) {
+      if (photoCap && cap) photoCap.textContent = cap;
+      return;
+    }
+    var src = imgUrl(img, 900);
+    var token = ++photoToken;
+    photoImg.setAttribute('data-src', img);
+    var frame = photoImg.parentNode;
+    var swap = function () {
+      if (token !== photoToken) return;
+      photoImg.src = src;
+      if (photoCap) photoCap.textContent = cap || '';
+    };
+    if (!hasGsap || reduced || !mode) { swap(); return; }
+    if (mode === 'reveal') {
+      gsap.to(frame, {
+        clipPath: 'inset(0 0 100% 0)', duration: 0.35, ease: 'power2.in', overwrite: true, onComplete: function () {
+          swap();
+          gsap.fromTo(frame, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 0.8, ease: EASE });
+          gsap.fromTo(photoImg, { scale: 1.15 }, { scale: 1, duration: 1.1, ease: EASE });
+        }
+      });
+    } else {
+      // Pré-carrega para a troca não piscar
+      var pre = new Image();
+      pre.onload = pre.onerror = function () {
+        if (token !== photoToken) return;
+        gsap.to(photoImg, {
+          autoAlpha: 0, duration: 0.14, ease: 'power1.in', overwrite: true, onComplete: function () {
+            swap();
+            gsap.fromTo(photoImg, { autoAlpha: 0, scale: 1.06 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: EASE });
           }
         });
-      } else {
-        photoImg.src = src;
-        photoCap.textContent = cat.cap;
-      }
+      };
+      pre.src = src;
     }
+  }
+
+  function itemPhoto(it) {
+    return it.img || (currentCatObj && currentCatObj.img);
   }
 
   function buildTabs() {
@@ -281,13 +309,36 @@
     if (cheapEl) cheapEl.addEventListener('change', function () { renderMenu(true); });
     if (photoImg && !sheetContent) photoImg.setAttribute('data-src', MENU[0].img);
     renderMenu(false);
-    listEl.addEventListener('click', function (e) {
-      var b = e.target.closest('.menu-item__photo');
-      if (!b) return;
-      var it = photoItems[+b.getAttribute('data-photo')];
+    var hoverTimer, leaveTimer;
+    var itemFrom = function (e) {
+      var el = e.target.closest && e.target.closest('.menu-item');
+      return el ? menuItems[+el.getAttribute('data-i')] : null;
+    };
+    var previewItem = function (it) {
+      clearTimeout(hoverTimer); clearTimeout(leaveTimer);
+      if (!it) return;
+      hoverTimer = setTimeout(function () { setMenuPhoto(itemPhoto(it), it.n, 'fade'); }, 70);
+    };
+    var openItem = function (it) {
       if (!it) return;
       var pr = typeof it.p === 'number' ? fmt(it.p) : (it.v ? it.v.map(function (x) { return x[0] + ' ' + fmt(x[1]); }).join(' · ') : (it.p || ''));
-      openDialog({ name: it.n, desc: it.d, price: pr, img: it.img });
+      openDialog({ name: it.n, desc: it.d, price: pr, img: itemPhoto(it) });
+    };
+    if (!isTouch) {
+      listEl.addEventListener('mouseover', function (e) { var it = itemFrom(e); if (it) previewItem(it); });
+      listEl.addEventListener('mouseleave', function () {
+        clearTimeout(hoverTimer);
+        leaveTimer = setTimeout(function () {
+          if (currentCatObj) setMenuPhoto(currentCatObj.img, currentCatObj.cap, 'fade');
+        }, 350);
+      });
+    }
+    listEl.addEventListener('focusin', function (e) { var it = itemFrom(e); if (it) previewItem(it); });
+    listEl.addEventListener('click', function (e) { openItem(itemFrom(e)); });
+    listEl.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var it = itemFrom(e);
+      if (it) { e.preventDefault(); openItem(it); }
     });
   }
 

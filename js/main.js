@@ -674,7 +674,7 @@
     dailyCard.innerHTML = dailyDefault;
     if (!d) return;
     var img = $('.daily-card__img img', dailyCard);
-    if (img && d.img) { img.src = imgUrl(d.img, 800); img.alt = d.name; }
+    if (img && d.img) { img.removeAttribute('data-photo'); img.src = imgUrl(d.img, 800); img.alt = d.name; }
     $('.eyebrow', dailyCard).textContent = 'Sugestão de hoje';
     $('.daily-card__title', dailyCard).textContent = d.name;
     var muted = $('.muted', dailyCard);
@@ -696,6 +696,18 @@
     $$('.js-bday-off').forEach(function (el) { el.hidden = !show; });
   }
 
+  // Fotos fixas da página (abertura, sobre nós, sugestão padrão) marcadas com
+  // data-photo="Nome do prato": usam a mesma foto do prato na aba Cardápio.
+  function applyPhotos(photos) {
+    if (!photos || !Sheet || !Sheet.norm) return;
+    $$('img[data-photo]').forEach(function (img) {
+      var src = photos[Sheet.norm(img.getAttribute('data-photo'))];
+      if (!src) return;
+      var url = imgUrl(src, 900);
+      if (img.getAttribute('src') !== url) img.setAttribute('src', url);
+    });
+  }
+
   function applyContent(c, initial) {
     if (!c) return;
     if (c.menu && c.menu.length && !initial) {
@@ -708,6 +720,7 @@
     renderEvents(c.events, initial);
     renderDaily(c.daily);
     renderPromos(c.promos);
+    applyPhotos(c.photos);
     if (!initial && hasGsap) ScrollTrigger.refresh();
   }
 

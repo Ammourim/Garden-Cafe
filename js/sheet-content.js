@@ -20,7 +20,7 @@ var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1eW5U0vxoKb55iv8m
     daily: 'Sugestão do dia',
     promos: 'Promoções'
   };
-  var CACHE_KEY = 'garden-sheet-v1';
+  var CACHE_KEY = 'garden-sheet-v2';
   var TIMEOUT = 8000;
 
   function sheetId(url) {
@@ -123,7 +123,34 @@ var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1eW5U0vxoKb55iv8m
   function pad(n) { return ('0' + n).slice(-2); }
 
   /* ------------------------------------------------------------ Conversão */
-  function buildMenu(itemRows, catRows) {
+
+  // Foto de cada prato: vem SÓ da coluna Imagem da aba Cardápio (inclusive de
+  // linhas escondidas com "Mostrar no site = NÃO"). Os outros lugares do site
+  // (destaques, categorias, sugestão do dia, abertura) apontam para o prato
+  // pelo nome e usam essa mesma foto.
+  function dishPhotos(itemRows) {
+    var photos = {};
+    itemRows.forEach(function (r) {
+      var k = norm(r.nome), img = pick(r, 'imagem');
+      if (k && img && !photos[k]) photos[k] = img;
+    });
+    return photos;
+  }
+
+  // Valor de uma coluna de foto fora do Cardápio: nome de prato, nome de
+  // categoria, ou link/arquivo de imagem. Nome que não existe = vazio.
+  function looksLikeImage(v) {
+    return /^https?:\/\//i.test(v) || /\.(webp|jpe?g|png|gif|avif)$/i.test(v) || /^[a-z0-9_-]+$/i.test(v);
+  }
+  function resolvePhoto(v, photos) {
+    v = String(v || '').trim();
+    if (!v) return '';
+    var k = norm(v);
+    if (photos[k]) return photos[k];
+    return looksLikeImage(v) && v.indexOf(' ') < 0 ? v : '';
+  }
+
+  function buildMenu(itemRows, catRows, photos) {
     var cats = [], byName = {};
     var catInfo = {}, groupNotes = {};
     catRows.forEach(function (r) {
@@ -140,7 +167,7 @@ var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1eW5U0vxoKb55iv8m
       var cat = byName[key];
       if (!cat) {
         var info = catInfo[key] || {};
-        cat = byName[key] = { id: slug(cname), label: cname, img: info.img || '', cap: info.cap || cname, note: info.note || '', _groups: [], _gmap: {} };
+        cat = byName[key] = { id: slug(cname), key: key, label: cname, img: info.img || '', cap: info.cap || '', note: info.note || '', _groups: [], _gmap: {} };
         cats.push(cat);
       }
       var gname = pick(r, 'grupo');
@@ -162,31 +189,89 @@ var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1eW5U0vxoKb55iv8m
       group.items.push(item);
     });
 
-    return cats.map(function (c) {
-      var out = { id: c.id, label: c.label, img: c.img, cap: c.cap };
-      if (c.note) out.note = c.note;
+    // Foto da categoria: a coluna Foto da aba Categorias é opcional (nome de
+    // prato, nome de outra categoria ou link). Vazia = foto do primeiro prato
+    // da categoria que tenha foto.
+    var out = cats.map(function (c) {
+      var o = { id: c.id, label: c.label, img: '', cap: c.cap };
+      if (c.note) o.note = c.note;
       var hasGroups = c._groups.some(function (g) { return g.t; });
-      if (hasGroups) out.groups = c._groups.map(function (g) { return { t: g.t || 'Outros', note: g.note || undefined, items: g.items }; });
-      else out.items = c._groups[0].items;
-      if (!out.img) {
-        // Sem foto da categoria: usa a primeira foto de item que houver
-        var all = out.items || [].concat.apply([], out.groups.map(function (g) { return g.items; }));
-        var withImg = all.filter(function (i) { return i.img; })[0];
-        out.img = withImg ? withImg.img : 'fachada';
-      }
-      return out;
-    }).filter(function (c) { return (c.items && c.items.length) || (c.groups && c.groups.length); });
+      if (hasGroups) o.groups = c._groups.map(function (g) { return { t: g.t || 'Outros', note: g.note || undefined, items: g.items }; });
+      else o.items = c._groups[0].items;
+      var all = o.items || [].concat.apply([], o.groups.map(function (g) { return g.items; }));
+      var first = all.filter(function (i) { return i.img; })[0];
+      var k = norm(c.img);
+      var isRef = !!(c.img && !photos[k] && byName[k] && k !== c.key);
+      if (c.img && photos[k]) { o.img = photos[k]; if (!o.cap) o.cap = c.img; }
+      else if (c.img && !byName[k]) o.img = resolvePhoto(c.img, photos);
+      if (!o.img && first && !isRef) { o.img = first.img; if (!o.cap) o.cap = first.n; }
+      o._ref = isRef ? k : '';
+      return o;
+    });
+    // Categoria que aponta para outra categoria (ex.: Cafés → Croissants)
+    var catImg = {};
+    out.forEach(function (o) { if (o.img) catImg[norm(o.label)] = o.img; });
+    out.forEach(function (o) {
+      if (o._ref) o.img = catImg[o._ref] || '';
+      delete o._ref;
+      if (!o.img) o.img = 'fachada';
+      if (!o.cap) o.cap = o.label;
+      catImg[norm(o.label)] = o.img;
+    });
+    return {
+      menu: out.filter(function (c) { return (c.items && c.items.length) || (c.groups && c.groups.length); }),
+      catImg: catImg
+    };
+  }
+
+  // Procura o prato pelo nome na aba Cardápio (sem ligar para acento/maiúscula)
+  function findDish(menu, name) {
+    var k = norm(name), hit = null;
+    if (!k) return null;
+    menu.some(function (c) {
+      var all = c.items || [].concat.apply([], c.groups.map(function (g) { return g.items; }));
+      hit = all.filter(function (i) { return norm(i.n) === k; })[0] || null;
+      return !!hit;
+    });
+    return hit;
   }
 
   function build(raw) {
     var content = {};
+    var items = raw.menu ? toObjects(raw.menu) : [];
+    var photos = dishPhotos(items);
+    var catImg = {};
+    var menu = [];
     if (raw.menu) {
-      var menu = buildMenu(toObjects(raw.menu), raw.cats ? toObjects(raw.cats) : []);
+      var m = buildMenu(items, raw.cats ? toObjects(raw.cats) : [], photos);
+      menu = m.menu; catImg = m.catImg;
       if (menu.length) content.menu = menu;
     }
+    // Mapa nome → foto que o site usa em todos os lugares (pratos primeiro,
+    // depois categorias). Também serve para as fotos fixas da abertura.
+    var all = {};
+    Object.keys(catImg).forEach(function (k) { all[k] = catImg[k]; });
+    Object.keys(photos).forEach(function (k) { all[k] = photos[k]; });
+    content.photos = all;
+
+    // Foto de um destaque ou sugestão: 1) a do prato com o mesmo nome no
+    // Cardápio; 2) a coluna Foto (nome de prato/categoria ou link).
+    function photoFor(name, col) {
+      return all[norm(name)] || resolvePhoto(col, all);
+    }
+
     if (raw.highlights) {
       var hl = toObjects(raw.highlights).filter(function (r) { return r.nome && visible(r); }).map(function (r) {
-        return { name: r.nome, short: pick(r, 'descricao curta'), desc: pick(r, 'descricao completa') || pick(r, 'descricao curta'), price: parsePrice(pick(r, 'preco')), img: pick(r, 'imagem') };
+        var dish = findDish(menu, r.nome) || {};
+        var short = pick(r, 'descricao curta'), full = pick(r, 'descricao completa');
+        var price = parsePrice(pick(r, 'preco'));
+        return {
+          name: r.nome,
+          short: short || dish.d || '',
+          desc: full || short || dish.d || '',
+          price: price !== null ? price : (dish.p !== undefined ? dish.p : null),
+          img: photoFor(r.nome, pick(r, 'foto') || pick(r, 'imagem'))
+        };
       });
       if (hl.length) content.highlights = hl;
     }
@@ -197,7 +282,8 @@ var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1eW5U0vxoKb55iv8m
     }
     if (raw.daily) {
       content.daily = toObjects(raw.daily).filter(function (r) { return pick(r, 'nome') && visible(r); }).map(function (r) {
-        return { name: pick(r, 'nome'), desc: pick(r, 'descri'), price: parsePrice(pick(r, 'preco')), img: pick(r, 'imagem'), date: parseDate(pick(r, 'data')) };
+        var name = pick(r, 'nome');
+        return { name: name, desc: pick(r, 'descri'), price: parsePrice(pick(r, 'preco')), img: photoFor(name, pick(r, 'foto') || pick(r, 'imagem')), date: parseDate(pick(r, 'data')) };
       });
     }
     if (raw.promos) {
@@ -269,6 +355,7 @@ var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1eW5U0vxoKb55iv8m
     fetch: fetchAll,
     imageUrl: imageUrl,
     _parseCsv: parseCsv,
-    _build: build
+    _build: build,
+    norm: norm
   };
 })();

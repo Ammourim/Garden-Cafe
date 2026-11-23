@@ -525,6 +525,17 @@
       $('#f-nome-err').textContent = '';
       nome.removeAttribute('aria-invalid');
     });
+    var setErr = function (id, msg) {
+      var el = $('#' + id);
+      if (!el) return;
+      el.textContent = msg || '';
+      el.closest('.field').classList.toggle('has-error', !!msg);
+    };
+    form.addEventListener('change', function (e) {
+      var n = e.target.name;
+      if (n === 'dia' || n === 'data') setErr('f-dia-err', '');
+      if (n === 'hora') setErr('f-hora-err', '');
+    });
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -539,15 +550,29 @@
         return;
       }
       var dia = fd.get('dia');
+      var hora = fd.get('hora');
+      var dv = fd.get('data');
+      var firstBad = null;
+      if (!dia || (dia === 'outra' && !dv)) {
+        setErr('f-dia-err', dia ? 'Escolha a data no calendário.' : 'Escolha o dia da reserva.');
+        firstBad = dia ? dateInput : $('input[name="dia"]', form);
+      }
+      if (!hora) {
+        setErr('f-hora-err', 'Escolha o horário.');
+        firstBad = firstBad || $('input[name="hora"]', form);
+      }
+      if (firstBad) {
+        firstBad.focus();
+        firstBad.closest('fieldset').scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' });
+        return;
+      }
       if (dia === 'outra') {
-        var dv = fd.get('data');
-        if (dv) { var p = String(dv).split('-'); dia = 'dia ' + p[2] + '/' + p[1]; }
-        else dia = 'data a combinar';
+        var p = String(dv).split('-'); dia = 'dia ' + p[2] + '/' + p[1];
       } else {
         var dl = String(dia).toLowerCase();
         dia = (dl === 'hoje' || dl === 'amanhã') ? dl : 'no ' + dl;
       }
-      var msg = 'Olá, Garden! Sou ' + n + '. Quero reservar: ' + fd.get('tipo') + ', ' + fd.get('pessoas') + ' pessoas, ' + dia + ' às ' + fd.get('hora') + '.';
+      var msg = 'Olá, Garden! Sou ' + n + '. Quero reservar: ' + fd.get('tipo') + ', ' + fd.get('pessoas') + (fd.get('pessoas') === '1' ? ' pessoa, ' : ' pessoas, ') + dia + ' às ' + hora + '.';
       if (fd.get('aniversario')) msg += ' É aniversário!';
       var obs = String(fd.get('obs') || '').trim();
       if (obs) msg += ' Observações: ' + obs;
@@ -617,7 +642,7 @@
         (ev.desc ? '<p>' + escapeHtml(ev.desc) + '</p>' : '') +
         (meta ? '<ul class="event__meta">' + meta + '</ul>' : '') +
         '<div class="event__ctas">' +
-        '<a class="btn btn--accent" href="#reservas" data-reserve="Evento"><svg class="ic"><use href="#i-whatsapp"/></svg>Faça sua reserva</a>' +
+        '<a class="btn btn--accent" href="#reservas" data-reserve="Evento"><svg class="ic"><use href="#i-calendar"/></svg>Faça sua reserva</a>' +
         '<a class="btn btn--outline-cream" href="tel:+' + escapeHtml(phone) + '"><svg class="ic"><use href="#i-phone"/></svg>' + escapeHtml(phoneLabel) + '</a>' +
         '</div></div></article>';
     }).join('');

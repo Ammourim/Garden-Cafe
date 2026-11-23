@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,700&family=Oswald:wght@500;600;700&family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800;1,6..12,400&display=swap">
   <link rel="preload" as="image" href="assets/img/cuscuz-doce.webp">
-  <link rel="stylesheet" href="css/style.css?v=3">
+  <link rel="stylesheet" href="css/style.css?v=4">
 
   <script>
     // Ativa os estados iniciais das animações só quando há JS e o usuário não pediu menos movimento.
@@ -101,7 +101,7 @@
         <a href="#reservas">Reservas</a>
         <a href="#onde">Onde estamos</a>
       </nav>
-      <a class="btn btn--accent btn--sm header__cta" href="#reservas"><svg class="ic"><use href="#i-whatsapp"/></svg>Reservar</a>
+      <a class="btn btn--accent btn--sm header__cta" href="#reservas"><svg class="ic"><use href="#i-calendar"/></svg>Reservar</a>
       <button class="burger" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-mobile">
         <span></span><span></span>
       </button>
@@ -121,7 +121,8 @@
     <div class="drawer__foot">
       <p><svg class="ic"><use href="#i-clock"/></svg>Todos os dias, 15h às 22h</p>
       <p><svg class="ic"><use href="#i-pin"/></svg>Rua Dr. Gustavo Pinto, 393</p>
-      <a class="btn btn--accent btn--lg btn--full" href="#reservas"><svg class="ic"><use href="#i-whatsapp"/></svg>Reservar mesa</a>
+      <a class="btn btn--accent btn--lg btn--full" href="https://www.google.com/maps/search/?api=1&amp;query=Garden+Caf%C3%A9+Rua+Doutor+Gustavo+Pinto+393+Jardim+S%C3%A3o+Paulo+Recife" target="_blank" rel="noopener"><svg class="ic"><use href="#i-nav"/></svg>Como chegar</a>
+      <a class="btn btn--outline-cream btn--lg btn--full" href="#reservas"><svg class="ic"><use href="#i-calendar"/></svg>Reservar mesa</a>
     </div>
   </div>
 
@@ -137,13 +138,14 @@
           <h1 class="hero__title" id="hero-title" data-split>Café e comida <em class="script">arretada.</em></h1>
           <p class="hero__lead" data-hero="fade">Um refúgio em meio à correria do cotidiano de Recife. Cuscuz, tapiocas, caldos, croissants e cafés com sabor de Nordeste.</p>
           <div class="hero__ctas" data-hero="fade">
-            <a class="btn btn--accent btn--lg" href="#reservas"><svg class="ic"><use href="#i-whatsapp"/></svg>Reservar mesa</a>
-            <a class="btn btn--outline-cream btn--lg" href="#cardapio">Ver cardápio<svg class="ic"><use href="#i-arrow-right"/></svg></a>
+            <a class="btn btn--accent btn--lg" href="#cardapio">Ver cardápio<svg class="ic"><use href="#i-arrow-right"/></svg></a>
+            <a class="btn btn--outline-cream btn--lg" href="https://www.google.com/maps/search/?api=1&amp;query=Garden+Caf%C3%A9+Rua+Doutor+Gustavo+Pinto+393+Jardim+S%C3%A3o+Paulo+Recife" target="_blank" rel="noopener"><svg class="ic"><use href="#i-nav"/></svg>Como chegar</a>
           </div>
           <ul class="hero__facts" data-hero="fade">
             <li><svg class="ic"><use href="#i-clock"/></svg><span class="js-open-status">Todos os dias, 15h às 22h</span></li>
-            <li><svg class="ic"><use href="#i-pin"/></svg>Rua Dr. Gustavo Pinto, 393</li>
+            <li><svg class="ic"><use href="#i-pin"/></svg>Rua Dr. Gustavo Pinto, 393 · Jardim São Paulo</li>
           </ul>
+          <p class="hero__note" data-hero="fade">Não precisa reservar, é só chegar. Grupo ou aniversário? <a href="#reservas">Reserve sua mesa</a>.</p>
         </div>
         <div class="hero__plates" aria-hidden="true">
           <div class="plate plate--xl" data-plate="main"><img src="assets/img/cuscuz-doce.webp" alt="" width="376" height="402" fetchpriority="high"></div>
@@ -301,7 +303,7 @@
               <li><svg class="ic"><use href="#i-ticket"/></svg>R$ 30,00</li>
             </ul>
             <div class="event__ctas">
-              <a class="btn btn--accent" href="#reservas" data-reserve="Evento"><svg class="ic"><use href="#i-whatsapp"/></svg>Faça sua reserva</a>
+              <a class="btn btn--accent" href="#reservas" data-reserve="Evento"><svg class="ic"><use href="#i-calendar"/></svg>Faça sua reserva</a>
               <a class="btn btn--outline-cream" href="tel:+5581986059740"><svg class="ic"><use href="#i-phone"/></svg>(81) 98605-9740</a>
             </div>
           </div>
@@ -340,7 +342,7 @@
           <div class="section-title section-title--left" data-reveal>
             <span class="eyebrow">Disponibilidade para</span>
             <h2 id="reserve-title" data-split>Reservas</h2>
-            <span class="script-accent">para eventos</span>
+            <span class="script-accent">mesa, festa ou evento</span>
           </div>
           <p data-reveal>Mesa, aniversário ou confraternização: preencha aqui e a gente continua a conversa no WhatsApp.</p>
           <div class="perk js-bday-off" data-reveal><svg class="ic ic--lg"><use href="#i-cake"/></svg><span class="js-bday">Aniversariante no Garden ganha sobremesa!</span></div>
@@ -362,7 +364,7 @@
           <div class="field">
             <label for="f-pessoas">Pessoas</label>
             <div class="select"><select id="f-pessoas" name="pessoas">
-              <option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>8</option><option>10</option><option>15+</option>
+              <option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>12</option><option>15+</option>
             </select></div>
           </div>
           <fieldset class="field field--full">
@@ -370,21 +372,25 @@
             <div class="chips">
               <label class="chip"><input type="radio" name="dia" value="Hoje"><span>Hoje</span></label>
               <label class="chip"><input type="radio" name="dia" value="Amanhã"><span>Amanhã</span></label>
-              <label class="chip"><input type="radio" name="dia" value="Sábado" checked><span>Sábado</span></label>
+              <label class="chip"><input type="radio" name="dia" value="Sábado"><span>Sábado</span></label>
               <label class="chip"><input type="radio" name="dia" value="Domingo"><span>Domingo</span></label>
               <label class="chip"><input type="radio" name="dia" value="outra"><span>Outra data</span></label>
             </div>
             <input class="date-input" type="date" name="data" aria-label="Escolha a data" hidden>
+            <span class="field__error" id="f-dia-err" role="alert"></span>
           </fieldset>
           <fieldset class="field field--full">
             <legend>Horário <span class="hint" title="Abrimos todos os dias, das 15h às 22h"><svg class="ic"><use href="#i-info"/></svg><span>Aberto das 15h às 22h</span></span></legend>
             <div class="chips">
               <label class="chip"><input type="radio" name="hora" value="15h"><span>15h</span></label>
+              <label class="chip"><input type="radio" name="hora" value="16h"><span>16h</span></label>
               <label class="chip"><input type="radio" name="hora" value="17h"><span>17h</span></label>
-              <label class="chip"><input type="radio" name="hora" value="19h" checked><span>19h</span></label>
+              <label class="chip"><input type="radio" name="hora" value="18h"><span>18h</span></label>
+              <label class="chip"><input type="radio" name="hora" value="19h"><span>19h</span></label>
               <label class="chip"><input type="radio" name="hora" value="20h"><span>20h</span></label>
               <label class="chip"><input type="radio" name="hora" value="21h"><span>21h</span></label>
             </div>
+            <span class="field__error" id="f-hora-err" role="alert"></span>
           </fieldset>
           <label class="check field--full">
             <input type="checkbox" name="aniversario">
@@ -454,10 +460,10 @@
     <div class="footer__bottom">Todo dia, uma nova experiência.</div>
   </footer>
 
-  <!-- Barra fixa de reserva no celular -->
+  <!-- Barra fixa no celular: cardápio e como chegar -->
   <div class="mobile-cta" aria-hidden="true">
-    <a class="btn btn--accent btn--full" href="#reservas" tabindex="-1"><svg class="ic"><use href="#i-whatsapp"/></svg>Reservar mesa</a>
-    <a class="icon-btn icon-btn--solid" href="#cardapio" tabindex="-1" aria-label="Ver cardápio"><svg class="ic"><use href="#i-coffee"/></svg></a>
+    <a class="btn btn--accent" href="#cardapio" tabindex="-1"><svg class="ic"><use href="#i-coffee"/></svg>Cardápio</a>
+    <a class="btn btn--outline-cream" href="https://www.google.com/maps/search/?api=1&amp;query=Garden+Caf%C3%A9+Rua+Doutor+Gustavo+Pinto+393+Jardim+S%C3%A3o+Paulo+Recife" target="_blank" rel="noopener" tabindex="-1"><svg class="ic"><use href="#i-nav"/></svg>Como chegar</a>
   </div>
 
   <!-- Detalhe do prato -->
@@ -473,7 +479,7 @@
         <span class="dialog__price"></span>
         <div class="dialog__ctas">
           <button class="btn btn--ghost" type="button" data-close>Fechar</button>
-          <a class="btn btn--accent" href="#reservas" data-close-go><svg class="ic"><use href="#i-whatsapp"/></svg>Reservar mesa</a>
+          <a class="btn btn--accent" href="#reservas" data-close-go><svg class="ic"><use href="#i-calendar"/></svg>Reservar mesa</a>
         </div>
       </div>
     </div>
@@ -490,6 +496,6 @@
   <script src="js/vendor/gsap.min.js" defer></script>
   <script src="js/vendor/ScrollTrigger.min.js" defer></script>
   <script src="js/vendor/lenis.min.js" defer></script>
-  <script src="js/main.js?v=3" defer></script>
+  <script src="js/main.js?v=4" defer></script>
 </body>
 </html>

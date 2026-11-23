@@ -21,7 +21,7 @@ window.GARDEN_INFO = {
 
 window.GARDEN_MENU = [
   {
-    id: 'cuscuz', label: 'Cuscuz', img: 'cuscuz-doce', cap: 'Cabeleira do Zezé',
+    id: 'cuscuz', label: 'Cuscuz', img: 'cabeleira-do-zeze', cap: 'Cabeleira do Zezé',
     items: [
       { n: 'Cuscuz do Sr. Biu', d: 'Cupim acebolado e queijo manteiga', p: 29 },
       { n: 'Lula Vassoureiro', d: 'Carne de sol desfiada na manteiga de garrafa, queijo coalho, coberto com requeijão', p: 27 },
@@ -34,7 +34,7 @@ window.GARDEN_MENU = [
       { n: 'Zé Lopes', d: 'Queijo coalho coberto com charque na manteiga de garrafa', p: 23 },
       { n: 'Ladeira de Olinda', d: 'Massa com verduras, coentro, cebola e tomate, recheio de calabresa', p: 19 },
       { n: 'Nena Queiroga', d: 'Queijo muçarela, acompanha guisado de costela, chips de batata-doce e ovo frito', p: 33 },
-      { n: 'Cabeleira do Zezé', d: 'Doce de leite, queijo manteiga e banana caramelizada, coberto com doce de leite e fios de casca de banana frita', p: 29, img: 'cuscuz-doce' }
+      { n: 'Cabeleira do Zezé', d: 'Doce de leite, queijo manteiga e banana caramelizada, coberto com doce de leite e fios de casca de banana frita', p: 29, img: 'cabeleira-do-zeze' }
     ]
   },
   {
@@ -168,7 +168,7 @@ window.GARDEN_MENU = [
     ]
   },
   {
-    id: 'especiais', label: 'Especiais', img: 'cuscuz-doce', cap: 'Comida arretada',
+    id: 'especiais', label: 'Especiais', img: 'cabeleira-do-zeze', cap: 'Comida arretada',
     groups: [
       {
         t: 'Especiais', items: [

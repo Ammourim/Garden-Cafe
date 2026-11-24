@@ -667,6 +667,9 @@ fieldset .field__error{margin-top:10px}
 .js:not(.reduced) [data-hero="fade"],
 .js:not(.reduced) [data-reveal]{opacity:0}
 .js:not(.reduced) [data-plate]{opacity:0}
+/* A foto principal começa em 1% (invisível a olho) para o Chrome contar o LCP
+   assim que ela pinta, e não só no fim da animação de entrada */
+.js:not(.reduced) [data-plate="main"]{opacity:.01}
 .js:not(.reduced) [data-split]{visibility:hidden}
 .js:not(.reduced) [data-split].is-split{visibility:visible}
 .split-line{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em;margin-bottom:-.08em}

@@ -338,15 +338,37 @@ var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1baBXoCkya-1MZCMe
   /* --------------------------------------------------- Links de imagem */
   // Aceita: nome de arquivo da pasta assets/img ("cuscuz-doce"), link do
   // Google Drive (convertido para link direto) ou qualquer link de imagem.
+  // Fotos do Drive: o Google devolve o arquivo original (muitas vezes PNG de
+  // ~1 MB). O sufixo "-rj-l80" pede JPEG com qualidade 80 (~85 KB em 720 px).
+  // As larguras são arredondadas para poucos tamanhos, assim a mesma foto
+  // usada em lugares diferentes do site vem do cache do navegador.
+  var DRIVE_WIDTHS = [160, 360, 720, 1080];
+  function driveId(src) {
+    var m = src.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=|thumbnail\?id=)([a-zA-Z0-9_-]{10,})/) ||
+      src.match(/docs\.google\.com\/uc\?(?:export=\w+&)?id=([a-zA-Z0-9_-]{10,})/);
+    return m ? m[1] : null;
+  }
+  function driveUrl(id, width) {
+    var w = DRIVE_WIDTHS[DRIVE_WIDTHS.length - 1];
+    for (var i = 0; i < DRIVE_WIDTHS.length; i++) if ((width || 720) <= DRIVE_WIDTHS[i]) { w = DRIVE_WIDTHS[i]; break; }
+    return 'https://lh3.googleusercontent.com/d/' + id + '=w' + w + '-rj-l80';
+  }
+
   function imageUrl(src, width) {
     src = String(src || '').trim();
     if (!src) return '';
-    var m = src.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=|thumbnail\?id=)([a-zA-Z0-9_-]{10,})/) ||
-      src.match(/docs\.google\.com\/uc\?(?:export=\w+&)?id=([a-zA-Z0-9_-]{10,})/);
-    if (m) return 'https://lh3.googleusercontent.com/d/' + m[1] + '=w' + (width || 1200);
+    var id = driveId(src);
+    if (id) return driveUrl(id, width);
     if (/^https?:\/\//i.test(src)) return src;
     if (/\.(webp|jpe?g|png|gif|avif)$/i.test(src)) return src.indexOf('/') >= 0 ? src : 'assets/img/' + src;
     return 'assets/img/' + src + '.webp';
+  }
+
+  // srcset para fotos do Drive (o Google redimensiona); vazio para as outras
+  function imageSrcset(src) {
+    var id = driveId(String(src || '').trim());
+    if (!id) return '';
+    return [360, 720, 1080].map(function (w) { return driveUrl(id, w) + ' ' + w + 'w'; }).join(', ');
   }
 
   window.GardenSheet = {
@@ -354,6 +376,7 @@ var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1baBXoCkya-1MZCMe
     cached: cached,
     fetch: fetchAll,
     imageUrl: imageUrl,
+    imageSrcset: imageSrcset,
     _parseCsv: parseCsv,
     _build: build,
     norm: norm

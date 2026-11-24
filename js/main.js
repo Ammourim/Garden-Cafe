@@ -67,6 +67,27 @@
     if (Sheet) return Sheet.imageUrl(src, w);
     return /^https?:/.test(src) ? src : 'assets/img/' + src + '.webp';
   }
+  // srcset/sizes para fotos do Drive: o celular baixa a largura que precisa
+  function imgSrcset(src) {
+    return Sheet && Sheet.imageSrcset ? Sheet.imageSrcset(src) : '';
+  }
+  function srcsetAttr(src, sizes) {
+    var set = imgSrcset(src);
+    return set ? ' srcset="' + escapeHtml(set) + '" sizes="' + sizes + '"' : '';
+  }
+  function setImg(img, src, w, sizes) {
+    var set = imgSrcset(src);
+    if (set) { img.sizes = sizes; img.srcset = set; } else img.removeAttribute('srcset');
+    img.src = imgUrl(src, w);
+  }
+  var SIZES = {
+    dish: '(max-width: 860px) 70vw, 300px',
+    event: '(max-width: 860px) 92vw, 420px',
+    daily: '180px',
+    photo: '(max-width: 860px) 92vw, 480px',
+    fixed: '(max-width: 860px) 60vw, 380px',
+    dialog: '(max-width: 640px) 100vw, 340px'
+  };
 
   function isoDate(d) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -238,7 +259,7 @@
     var frame = photoImg.parentNode;
     var swap = function () {
       if (token !== photoToken) return;
-      photoImg.src = src;
+      setImg(photoImg, img, 900, SIZES.photo);
       if (photoCap) photoCap.textContent = cap || '';
     };
     if (!hasGsap || reduced || !mode) { swap(); return; }
@@ -262,6 +283,8 @@
           }
         });
       };
+      var preSet = imgSrcset(img);
+      if (preSet) { pre.sizes = SIZES.photo; pre.srcset = preSet; }
       pre.src = src;
     }
   }
@@ -462,7 +485,7 @@
   function openDialog(data) {
     if (!dialog) return;
     lastFocus = document.activeElement;
-    $('.dialog__img img', dialog).src = imgUrl(data.img, 1200);
+    setImg($('.dialog__img img', dialog), data.img, 720, SIZES.dialog);
     $('.dialog__img img', dialog).alt = data.name;
     $('#dialog-title').textContent = data.name;
     $('.dialog__desc', dialog).textContent = data.desc;
@@ -883,7 +906,7 @@
       var data = { name: d.name, desc: d.desc || d.short || '', price: price, img: d.img || 'maria-bonita' };
       return '<article class="dish" role="listitem" data-dish="' + escapeHtml(JSON.stringify(data)) + '">' +
         '<button class="dish__btn" type="button" aria-label="Ver detalhes: ' + escapeHtml(d.name) + '">' +
-        '<span class="dish__img"><img src="' + escapeHtml(imgUrl(data.img, 700)) + '" alt="' + escapeHtml(d.name) + '" width="600" height="600" loading="lazy"></span>' +
+        '<span class="dish__img"><img src="' + escapeHtml(imgUrl(data.img, 700)) + '"' + srcsetAttr(data.img, SIZES.dish) + ' alt="' + escapeHtml(d.name) + '" width="600" height="600" loading="lazy"></span>' +
         '<span class="dish__body"><span class="badge badge--plate">' + escapeHtml(d.name) + '</span>' +
         (d.short ? '<span class="muted">' + escapeHtml(d.short) + '</span>' : '') +
         (price ? '<span class="dish__price">' + escapeHtml(price) + '</span>' : '') +
@@ -910,7 +933,7 @@
         meta += '<li><svg class="ic"><use href="#i-ticket"/></svg>' + escapeHtml(ep) + '</li>';
       }
       return '<article class="event' + (ev.img ? '' : ' event--noimg') + '"' + attrs + '>' +
-        (ev.img ? '<div class="event__img"' + (initial ? ' data-clip' : '') + '><img src="' + escapeHtml(imgUrl(ev.img, 900)) + '" alt="' + escapeHtml(ev.title) + '" width="600" height="600" loading="lazy"></div>' : '') +
+        (ev.img ? '<div class="event__img"' + (initial ? ' data-clip' : '') + '><img src="' + escapeHtml(imgUrl(ev.img, 900)) + '"' + srcsetAttr(ev.img, SIZES.event) + ' alt="' + escapeHtml(ev.title) + '" width="600" height="600" loading="lazy"></div>' : '') +
         '<div class="event__body">' +
         (ev.type ? '<span class="badge badge--novidade">' + escapeHtml(ev.type) + '</span>' : '') +
         '<h3>' + escapeHtml(ev.title) + '</h3>' +
@@ -939,7 +962,7 @@
     dailyCard.innerHTML = dailyDefault;
     if (!d) return;
     var img = $('.daily-card__img img', dailyCard);
-    if (img && d.img) { img.removeAttribute('data-photo'); img.src = imgUrl(d.img, 800); img.alt = d.name; }
+    if (img && d.img) { img.removeAttribute('data-photo'); setImg(img, d.img, 360, SIZES.daily); img.alt = d.name; }
     $('.eyebrow', dailyCard).textContent = 'Sugestão de hoje';
     $('.daily-card__title', dailyCard).textContent = d.name;
     var muted = $('.muted', dailyCard);
@@ -968,8 +991,8 @@
     $$('img[data-photo]').forEach(function (img) {
       var src = photos[Sheet.norm(img.getAttribute('data-photo'))];
       if (!src) return;
-      var url = imgUrl(src, 900);
-      if (img.getAttribute('src') !== url) img.setAttribute('src', url);
+      var url = imgUrl(src, 720);
+      if (img.getAttribute('src') !== url) setImg(img, src, 720, SIZES.fixed);
     });
   }
 
@@ -1068,7 +1091,7 @@
     var title = $('.hero__title');
     tl.to(splitMap.get(title), { yPercent: 0, duration: 1.3, ease: EASE, stagger: 0.08 }, 0)
       .fromTo('[data-hero="fade"]', { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 1.1, ease: EASE, stagger: 0.09 }, 0.15)
-      .fromTo('[data-plate="main"]', { autoAlpha: 0, scale: 0.82, rotate: -18 }, { autoAlpha: 1, scale: 1, rotate: 0, duration: 1.6, ease: EASE }, 0.05)
+      .fromTo('[data-plate="main"]', { autoAlpha: 0.01, scale: 0.82, rotate: -18 }, { autoAlpha: 1, scale: 1, rotate: 0, duration: 1.6, ease: EASE }, 0.05)
       .fromTo('[data-plate="side"]', { autoAlpha: 0, scale: 0.7, rotate: 14, y: 40 }, { autoAlpha: 1, scale: 1, rotate: 0, y: 0, duration: 1.5, ease: EASE }, 0.25)
       .fromTo('[data-plate="tiny"]', { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 1.3, ease: EASE }, 0.4)
       .fromTo('[data-plate="badge"]', { autoAlpha: 0, y: 16, rotate: -12 }, { autoAlpha: 1, y: 0, rotate: -4, duration: 1, ease: 'back.out(1.6)' }, 0.85)

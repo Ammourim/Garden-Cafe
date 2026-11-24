@@ -533,10 +533,7 @@
     var nome = $('#f-nome');
     var pessoas = $('#f-pessoas');
     var obs = $('#f-obs');
-    var bubble = $('[data-wa-bubble]', form);
-    var waStatus = $('[data-wa-status]', form);
     var bdayCheck = $('input[name="aniversario"]', form);
-    var lastLines = [];
 
     var dd = function (d) { return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'); };
     var addDays = function (d, n) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() + n); return x; };
@@ -614,44 +611,21 @@
     }
 
     // Mensagem com a cara do Garden. *negrito* e _itálico_ são do WhatsApp.
-    function buildLines(f, forPreview) {
+    function buildLines(f) {
       var lines = [];
       var quem = f.nome ? 'Aqui é *' + f.nome + '* e eu' : 'Eu';
       lines.push('Olá, Garden! 🌿');
       lines.push(quem + ' gostaria de ' + TIPO_FRASE[f.tipo] + '.');
       lines.push('');
       lines.push('👥 *Pessoas:* ' + f.pessoas + (f.pessoas === 1 ? ' pessoa' : ' pessoas'));
-      lines.push('📅 *Dia:* ' + (f.dia || (forPreview ? '…' : 'a combinar')));
-      lines.push('🕖 *Horário:* ' + (f.hora || (forPreview ? '…' : 'a combinar')));
+      lines.push('📅 *Dia:* ' + (f.dia || 'a combinar'));
+      lines.push('🕖 *Horário:* ' + (f.hora || 'a combinar'));
       if (f.aniversario || f.tipo === 'Aniversário') lines.push('🎂 *Tem aniversariante na mesa!*');
       if (f.obs) lines.push('📝 *Observações:* ' + f.obs.replace(/\s*\n\s*/g, ' '));
       lines.push('');
       lines.push('Pode confirmar pra mim? Até já! ☕');
       lines.push('_Enviado pelo site do Garden Café_');
       return lines;
-    }
-
-    function waToHtml(line) {
-      var safe = escapeHtml(line);
-      return safe
-        .replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>')
-        .replace(/(^|\s)_([^_\n]+)_(?=\s|$)/g, '$1<em>$2</em>');
-    }
-
-    function renderPreview() {
-      var lines = buildLines(readForm(), true);
-      bubble.innerHTML = lines.map(function (l, i) {
-        var changed = !reduced && lastLines.length && lastLines[i] !== l;
-        return '<span class="wa-line' + (changed ? ' is-new' : '') + '">' + (l ? waToHtml(l) : '&nbsp;') + '</span>';
-      }).join('');
-      lastLines = lines;
-      // A marca de "mudou" some com uma transição suave
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          $$('.wa-line.is-new', bubble).forEach(function (el) { el.classList.remove('is-new'); });
-        });
-      });
-      updateSteps();
     }
 
     function updateSteps() {
@@ -661,28 +635,10 @@
       steps[1].classList.toggle('is-done', !!(f.dia && f.hora));
     }
 
-    // Digitação suave: linha do campo pulsa, prévia mostra "digitando…"
-    var typingTimer;
-    var previewTimer;
     function onTyping(input) {
       var ctrl = input.closest('.control');
-      if (ctrl) {
-        ctrl.classList.toggle('is-filled', !!input.value.trim());
-        if (!reduced) {
-          ctrl.classList.remove('is-typing');
-          void ctrl.offsetWidth;
-          ctrl.classList.add('is-typing');
-        }
-      }
-      waStatus.classList.add('is-typing');
-      waStatus.textContent = 'digitando';
-      clearTimeout(typingTimer);
-      typingTimer = setTimeout(function () {
-        waStatus.classList.remove('is-typing');
-        waStatus.textContent = 'para o WhatsApp do Garden';
-      }, 900);
-      clearTimeout(previewTimer);
-      previewTimer = setTimeout(renderPreview, 120);
+      if (ctrl) ctrl.classList.toggle('is-filled', !!input.value.trim());
+      updateSteps();
     }
 
     function autoGrow(t) {
@@ -713,12 +669,11 @@
       $('[data-step="-1"]', form).disabled = v <= min;
       $('[data-step="1"]', form).disabled = v >= max;
       if (bump && !reduced) { pessoas.classList.remove('is-bump'); void pessoas.offsetWidth; pessoas.classList.add('is-bump'); }
-      renderPreview();
+      updateSteps();
     }
     $$('.stepper__btn', form).forEach(function (b) {
       b.addEventListener('click', function () { setPessoas((parseInt(pessoas.value, 10) || 1) + +b.getAttribute('data-step'), true); });
     });
-    pessoas.addEventListener('input', function () { if (pessoas.value !== '') renderPreview(); });
     pessoas.addEventListener('blur', function () { setPessoas(pessoas.value); });
 
     var setErr = function (id, msg) {
@@ -737,7 +692,7 @@
       if (n === 'dia' || n === 'data') { setErr('f-dia-err', ''); refreshHours(); }
       if (n === 'hora') setErr('f-hora-err', '');
       if (n === 'tipo' && e.target.value === 'Aniversário') bdayCheck.checked = true;
-      renderPreview();
+      updateSteps();
     });
 
     // Atalhos do site ("Faça sua reserva" do evento, cards de aniversário…)
@@ -746,7 +701,7 @@
       if (!r) return;
       r.checked = true;
       if (tipo === 'Aniversário') bdayCheck.checked = true;
-      renderPreview();
+      updateSteps();
     };
 
     form.addEventListener('submit', function (e) {
@@ -778,7 +733,7 @@
         firstBad.closest('fieldset').scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' });
         return;
       }
-      var msg = buildLines(f, false).join('\n');
+      var msg = buildLines(f).join('\n');
       var url = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(msg);
       showToast('Reserva pronta, ' + f.primeiro + '!', 'Abrindo o WhatsApp do Garden…');
       setTimeout(function () { window.open(url, '_blank', 'noopener'); }, 450);
@@ -786,6 +741,59 @@
 
     refreshDays();
     setPessoas(pessoas.value);
+    $$('[data-caret]', form).forEach(initCaret);
+  }
+
+  /* ------------------------------------------------------------------------
+     Caret suave (adaptado de movin.design/components/inputs/caret)
+     O caret nativo fica transparente. A posição dele (recuo + largura do texto
+     antes do cursor, medida num canvas com a fonte do campo, menos a rolagem
+     horizontal) move um caret desenhado; um rastro de 1px esticado entre o
+     ponto antigo e o novo encolhe até ele. Só pisca quando está parado.
+     ------------------------------------------------------------------------ */
+  function initCaret(root) {
+    var input = $('.field-caret__input', root);
+    var tail = $('.field-caret__tail', root);
+    var ctx = document.createElement('canvas').getContext('2d');
+    if (!input || !ctx) return;
+    var x = null;
+    var timer = 0;
+
+    function measure() {
+      var cs = getComputedStyle(input);
+      ctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+      var pl = parseFloat(cs.paddingLeft);
+      var text = input.value.slice(0, input.selectionEnd == null ? 0 : input.selectionEnd);
+      var at = pl + ctx.measureText(text).width - input.scrollLeft;
+      var clamped = Math.max(pl - 1, Math.min(input.clientWidth - parseFloat(cs.paddingRight), at));
+      return input.offsetLeft + parseFloat(cs.borderLeftWidth) + clamped;
+    }
+    function update() {
+      var on = document.activeElement === input && input.selectionStart === input.selectionEnd;
+      root.classList.toggle('field-caret--on', on);
+      if (!on) return;
+      var nx = measure();
+      if (nx === x) return;
+      if (x !== null && tail && !reduced && tail.animate && Math.abs(nx - x) > 3) {
+        tail.classList.toggle('field-caret__tail--left', nx < x);
+        tail.animate([
+          { opacity: 1, transform: 'translateX(' + Math.min(x, nx) + 'px) scaleX(' + Math.abs(nx - x) + ')' },
+          { opacity: 0, transform: 'translateX(' + nx + 'px) scaleX(1)' }
+        ], { duration: 260, easing: 'cubic-bezier(0.2, 0, 0, 1)' });
+      }
+      x = nx;
+      root.style.setProperty('--field-caret-x', nx.toFixed(1) + 'px');
+      root.classList.add('field-caret--moving');
+      clearTimeout(timer);
+      timer = setTimeout(function () { root.classList.remove('field-caret--moving'); }, 500);
+    }
+    input.addEventListener('input', update);
+    input.addEventListener('focus', update);
+    input.addEventListener('blur', function () { x = null; update(); });
+    input.addEventListener('scroll', update);
+    document.addEventListener('selectionchange', function () { if (document.activeElement === input) update(); });
+    // A fonte da web pode chegar depois do primeiro desenho: mede de novo
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { x = null; update(); });
   }
 
   /* ------------------------------------------------------------------------

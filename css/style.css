@@ -460,12 +460,19 @@ figure{margin:0}
 .field:focus-within > label,.field:focus-within > legend{color:var(--mata-700)}
 .optional{font-weight:400;color:var(--text-muted)}
 
-/* Campo com linha que cresce e brilho suave ao digitar */
+/* Caret suave (adaptado de movin.design/components/inputs/caret):
+   o caret nativo fica transparente e um caret desenhado segue o texto,
+   deixando um rastro curto quando salta. Pisca só quando está parado. */
 .control{position:relative}
-.control::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:2px;border-radius:2px;background:linear-gradient(90deg, var(--mata-600), var(--terracota-400));transform:scaleX(0);transform-origin:left;opacity:.9;transition:transform .5s var(--ease-out)}
-.control:focus-within::after{transform:scaleX(1)}
-.control.is-typing::after{animation:inkpulse .6s var(--ease-out)}
-@keyframes inkpulse{0%{opacity:.55;filter:brightness(1)}40%{opacity:1;filter:brightness(1.25)}100%{opacity:.9;filter:brightness(1)}}
+.field-caret{--field-caret-x:0px}
+.field .field-caret input.field-caret__input{caret-color:transparent}
+.field-caret__head,.field-caret__tail{position:absolute;top:50%;left:0;border-radius:1px;pointer-events:none}
+.field-caret__head{width:2px;height:22px;margin-top:-11px;background:var(--terracota-600);opacity:0;transform:translateX(var(--field-caret-x));transition:transform .09s cubic-bezier(.2,0,0,1),opacity .1s}
+.field-caret__tail{width:1px;height:16px;margin-top:-8px;background:linear-gradient(90deg, rgba(168,85,31,0), rgba(168,85,31,.55));opacity:0;transform-origin:0 50%}
+.field-caret__tail--left{background:linear-gradient(270deg, rgba(168,85,31,0), rgba(168,85,31,.55))}
+.field-caret--on .field-caret__head{opacity:1;animation:field-caret-blink 1.06s steps(1) .5s infinite}
+.field-caret--moving .field-caret__head{animation:none}
+@keyframes field-caret-blink{50%{opacity:0}}
 
 .field input[type="text"],.field input[type="date"],.field textarea,.select select{width:100%;min-height:50px;padding:12px 14px;border-radius:var(--radius-md);border:1.5px solid var(--border-subtle);background:var(--creme-50);font:400 16px/1.4 var(--font-sans);color:var(--tinta-800);caret-color:var(--terracota-600);transition:border-color var(--dur-slow) var(--ease-out),box-shadow var(--dur-slow) var(--ease-out),background-color var(--dur-slow) var(--ease-out);-webkit-appearance:none;appearance:none}
 .field input[type="text"]{padding-right:44px}
@@ -539,23 +546,6 @@ fieldset .field__error{margin-top:10px}
 .check strong{display:block;font:700 15px/1.3 var(--font-sans);color:var(--cafe-900)}
 .check small{display:block;font-size:13px;color:var(--terracota-700)}
 
-/* Prévia da mensagem no estilo WhatsApp, com as cores do Garden */
-.wa-preview{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border-subtle);background:var(--creme-150)}
-.wa-preview__head{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--mata-800);color:var(--creme-100)}
-.wa-preview__head img{width:36px;height:36px;border-radius:50%;background:var(--mata-700);padding:5px}
-.wa-preview__head strong{display:block;font:700 14px/1.2 var(--font-sans)}
-.wa-preview__status{display:block;font-size:12px;color:var(--salvia-300);transition:color var(--dur-slow) var(--ease-out)}
-.wa-preview__status.is-typing{color:var(--terracota-300)}
-.wa-preview__status.is-typing::after{content:"";display:inline-block;width:1.2em;text-align:left;animation:dots 1.2s steps(4) infinite;vertical-align:bottom}
-@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
-.wa-preview__chat{display:flex;justify-content:flex-end;padding:16px 14px;background-image:radial-gradient(rgba(110,63,21,.07) 1px, transparent 1px);background-size:14px 14px}
-.wa-bubble{position:relative;max-width:min(100%, 420px);padding:10px 12px 8px;border-radius:12px 4px 12px 12px;background:#E4EBCB;color:var(--tinta-900);font:400 14px/1.5 var(--font-sans);white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:0 1px 1px rgba(58,32,11,.12)}
-.wa-bubble strong{font-weight:700}
-.wa-bubble em{font-style:italic;color:var(--tinta-600)}
-.wa-bubble .wa-line{display:block;transition:background-color .9s var(--ease-out);border-radius:4px}
-.wa-bubble .wa-line.is-new{background-color:rgba(217,146,90,.28);transition:none}
-.wa-bubble .wa-empty{color:var(--tinta-500)}
-
 .form-card__foot{margin:-14px 0 0;text-align:center;font-size:13px;color:var(--text-muted)}
 
 @media (max-width: 860px) {
@@ -566,11 +556,11 @@ fieldset .field__error{margin-top:10px}
   .form-card{padding:20px 16px;gap:24px}
   .chip span{padding:0 14px}
   .chip--date span{min-width:0;padding:0 13px}
-  .wa-preview__chat{padding:14px 10px}
 }
 @media (prefers-reduced-motion: reduce) {
-  .control.is-typing::after,.stepper input.is-bump,.field__error,.reveal-row{animation:none}
-  .wa-preview__status.is-typing::after{animation:none;content:"..."}
+  .stepper input.is-bump,.field__error,.reveal-row{animation:none}
+  .field-caret__head{transition:none}
+  .field-caret__tail{display:none}
 }
 
 /* --------------------------------------------------------------------------

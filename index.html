@@ -337,7 +337,7 @@
           <div class="perk js-bday-off" data-reveal><svg class="ic ic--lg"><use href="#i-cake"/></svg><span class="js-bday">Aniversariante no Garden ganha sobremesa!</span></div>
           <ol class="reserve__how" data-reveal>
             <li><span>1</span>Conte quem vem e quando</li>
-            <li><span>2</span>Confira a mensagem pronta</li>
+            <li><span>2</span>A gente monta a mensagem pra você</li>
             <li><span>3</span>Envie no WhatsApp e a gente confirma</li>
           </ol>
           <a class="reserve__wa" href="https://wa.me/5581979003779" target="_blank" rel="noopener" data-reveal><svg class="ic"><use href="#i-whatsapp"/></svg>(81) 97900-3779</a>
@@ -348,8 +348,10 @@
             <p class="form-step__title"><span class="form-step__num" aria-hidden="true">1</span>Quem vem</p>
             <div class="field field--full">
               <label for="f-nome">Seu nome</label>
-              <div class="control">
-                <input id="f-nome" name="nome" type="text" autocomplete="name" autocapitalize="words" maxlength="60" placeholder="Como devemos te chamar?" required aria-describedby="f-nome-err">
+              <div class="control field-caret" data-caret>
+                <input id="f-nome" class="field-caret__input" name="nome" type="text" autocomplete="name" autocapitalize="words" maxlength="60" placeholder="Como devemos te chamar?" required aria-describedby="f-nome-err">
+                <span class="field-caret__tail" aria-hidden="true"></span>
+                <span class="field-caret__head" aria-hidden="true"></span>
                 <span class="control__ok" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span>
               </div>
               <span class="field__error" id="f-nome-err" role="alert"></span>
@@ -418,16 +420,6 @@
                 <textarea id="f-obs" name="obs" rows="2" maxlength="280" placeholder="Mesa na área externa, cadeirinha para criança, restrição alimentar…" aria-describedby="f-obs-count"></textarea>
               </div>
               <span class="counter" id="f-obs-count" aria-live="off"><span data-count>0</span>/280</span>
-            </div>
-          </div>
-
-          <div class="wa-preview" aria-labelledby="wa-preview-title">
-            <div class="wa-preview__head">
-              <img src="assets/img/garden-flower-cream-256.webp" alt="" width="36" height="36">
-              <span><strong id="wa-preview-title">Prévia da mensagem</strong><small class="wa-preview__status" data-wa-status>para o WhatsApp do Garden</small></span>
-            </div>
-            <div class="wa-preview__chat">
-              <div class="wa-bubble" data-wa-bubble aria-live="polite" aria-atomic="true"></div>
             </div>
           </div>
 

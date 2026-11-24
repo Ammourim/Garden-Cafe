@@ -981,14 +981,11 @@
       setActive(def, true);
     };
 
-    // Mouse: abre ao passar; parallax e inclinação seguem o cursor
+    // Mouse: abre ao passar e o último prato fica aberto ao sair; parallax e inclinação seguem o cursor
     if (canHover) {
       root.addEventListener('mouseover', function (e) {
         var i = indexOf(e.target);
         if (i > -1) setActive(i);
-      });
-      root.addEventListener('mouseleave', function () {
-        if (!root.contains(document.activeElement)) setActive(def);
       });
       if (useGsap) {
         root.addEventListener('mousemove', function (e) {
@@ -1009,9 +1006,6 @@
     root.addEventListener('focusin', function (e) {
       var i = indexOf(e.target);
       if (i > -1) setActive(i);
-    });
-    root.addEventListener('focusout', function (e) {
-      if (!root.contains(e.relatedTarget) && !root.matches(':hover')) setActive(def);
     });
     // Toque: faixa fechada abre; aberta leva ao prato no cardápio.
     // Guarda qual estava aberta antes do toque, porque o foco do toque já abre a faixa.

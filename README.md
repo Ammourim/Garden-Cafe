@@ -2,6 +2,10 @@
 
 Landing page estática do GARDEN (HTML, CSS e JavaScript puros).
 
+**Acesse a página:** https://ammourim.github.io/Garden-Cafe/
+
+Publicada pelo GitHub Pages a partir da branch `main`. Cada `git push` na `main` atualiza o site em alguns minutos.
+
 ## Estrutura
 
 ```

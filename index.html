@@ -19,7 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" href="assets/fonts/playfair-display-latin.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="assets/fonts/nunito-sans-latin.woff2" crossorigin>
   <link rel="preload" as="image" href="assets/img/cabeleira-do-zeze.webp">
-  <link rel="stylesheet" href="css/style.css?v=13">
+  <link rel="stylesheet" href="css/style.css?v=14">
 
   <script>
     // Ativa os estados iniciais das animações só quando há JS e o usuário não pediu menos movimento.
@@ -247,9 +247,16 @@
           <div class="menu-panel__list"></div>
           <noscript><p>Ative o JavaScript para ver o cardápio completo, ou <a href="https://drive.google.com/file/d/1xTZ1eb9dNav754_FVXNR_p6avcQza7se/view">abra o cardápio em PDF</a>.</p></noscript>
         </div>
-        <aside class="menu-photo" aria-hidden="true">
-          <div class="menu-photo__frame"><img src="assets/img/cabeleira-do-zeze.webp" alt="" width="900" height="720" loading="lazy"></div>
-          <span class="badge badge--plate menu-photo__cap">Cabeleira do Zezé</span>
+        <aside class="menu-spiral" aria-hidden="true">
+          <div class="spiral" data-spiral>
+            <div class="spiral__stage"></div>
+            <div class="spiral__empty" hidden>
+              <svg class="spiral__empty-ic"><use href="#i-sprig"/></svg>
+              <p class="spiral__empty-title">Fotos em breve</p>
+              <p class="spiral__empty-text">Os pratos desta categoria ainda vão ganhar retrato.</p>
+            </div>
+          </div>
+          <span class="badge badge--plate spiral__cap" hidden></span>
         </aside>
       </div>
     </section>
@@ -519,6 +526,7 @@
   <script src="js/vendor/gsap.min.js" defer></script>
   <script src="js/vendor/ScrollTrigger.min.js" defer></script>
   <script src="js/vendor/lenis.min.js" defer></script>
-  <script src="js/main.js?v=13" defer></script>
+  <script src="js/spiral.js?v=1" defer></script>
+  <script src="js/main.js?v=14" defer></script>
 </body>
 </html>

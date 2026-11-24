@@ -160,8 +160,13 @@
   var titleEl = $('.menu-panel__title');
   var noteEl = $('.menu-panel__note');
   var cheapEl = $('.js-cheap');
-  var photoImg = $('.menu-photo__frame img');
-  var photoCap = $('.menu-photo__cap');
+  var spiral = window.GardenSpiral && $('[data-spiral]') ? window.GardenSpiral($('[data-spiral]'), {
+    cap: $('.spiral__cap'),
+    reduced: reduced,
+    gsap: hasGsap ? window.gsap : null,
+    url: function (src) { return imgUrl(src, 360); },
+    onPick: function (it) { openItem(it); }
+  }) : null;
   var currentCat = MENU[0] && MENU[0].id;
 
   function itemMinPrice(it) {
@@ -242,55 +247,18 @@
       swap();
     }
 
-    // Foto lateral (desktop): volta para a foto da categoria
-    setMenuPhoto(cat.img, cat.cap, animate ? 'reveal' : null);
-  }
-
-  // Troca a foto lateral. mode: 'reveal' (troca de categoria), 'fade' (item), null (sem animação)
-  var photoToken = 0;
-  function setMenuPhoto(img, cap, mode) {
-    if (!photoImg || !img || photoImg.getAttribute('data-src') === img) {
-      if (photoCap && cap) photoCap.textContent = cap;
-      return;
-    }
-    var src = imgUrl(img, 900);
-    var token = ++photoToken;
-    photoImg.setAttribute('data-src', img);
-    var frame = photoImg.parentNode;
-    var swap = function () {
-      if (token !== photoToken) return;
-      setImg(photoImg, img, 900, SIZES.photo);
-      if (photoCap) photoCap.textContent = cap || '';
-    };
-    if (!hasGsap || reduced || !mode) { swap(); return; }
-    if (mode === 'reveal') {
-      gsap.to(frame, {
-        clipPath: 'inset(0 0 100% 0)', duration: 0.35, ease: 'power2.in', overwrite: true, onComplete: function () {
-          swap();
-          gsap.fromTo(frame, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 0.8, ease: EASE });
-          gsap.fromTo(photoImg, { scale: 1.15 }, { scale: 1, duration: 1.1, ease: EASE });
-        }
-      });
-    } else {
-      // Pré-carrega para a troca não piscar
-      var pre = new Image();
-      pre.onload = pre.onerror = function () {
-        if (token !== photoToken) return;
-        gsap.to(photoImg, {
-          autoAlpha: 0, duration: 0.14, ease: 'power1.in', overwrite: true, onComplete: function () {
-            swap();
-            gsap.fromTo(photoImg, { autoAlpha: 0, scale: 1.06 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: EASE });
-          }
-        });
-      };
-      var preSet = imgSrcset(img);
-      if (preSet) { pre.sizes = SIZES.photo; pre.srcset = preSet; }
-      pre.src = src;
-    }
+    // Espiral de fotos: só os pratos com foto que estão na lista
+    if (spiral) spiral.setItems(menuItems.filter(function (it) { return it.img; }), animate);
   }
 
   function itemPhoto(it) {
     return it.img || (currentCatObj && currentCatObj.img);
+  }
+
+  function openItem(it) {
+    if (!it) return;
+    var pr = typeof it.p === 'number' ? fmt(it.p) : (it.v ? it.v.map(function (x) { return x[0] + ' ' + fmt(x[1]); }).join(' · ') : (it.p || ''));
+    openDialog({ name: it.n, desc: it.d, price: pr, img: itemPhoto(it) });
   }
 
   function buildTabs() {
@@ -336,33 +304,11 @@
       if (e.key === 'ArrowLeft') { e.preventDefault(); selectTab(tabs[(i - 1 + tabs.length) % tabs.length], true); }
     });
     if (cheapEl) cheapEl.addEventListener('change', function () { renderMenu(true); });
-    if (photoImg && !sheetContent) photoImg.setAttribute('data-src', MENU[0].img);
     renderMenu(false);
-    var hoverTimer, leaveTimer;
     var itemFrom = function (e) {
       var el = e.target.closest && e.target.closest('.menu-item');
       return el ? menuItems[+el.getAttribute('data-i')] : null;
     };
-    var previewItem = function (it) {
-      clearTimeout(hoverTimer); clearTimeout(leaveTimer);
-      if (!it) return;
-      hoverTimer = setTimeout(function () { setMenuPhoto(itemPhoto(it), it.n, 'fade'); }, 70);
-    };
-    var openItem = function (it) {
-      if (!it) return;
-      var pr = typeof it.p === 'number' ? fmt(it.p) : (it.v ? it.v.map(function (x) { return x[0] + ' ' + fmt(x[1]); }).join(' · ') : (it.p || ''));
-      openDialog({ name: it.n, desc: it.d, price: pr, img: itemPhoto(it) });
-    };
-    if (!isTouch) {
-      listEl.addEventListener('mouseover', function (e) { var it = itemFrom(e); if (it) previewItem(it); });
-      listEl.addEventListener('mouseleave', function () {
-        clearTimeout(hoverTimer);
-        leaveTimer = setTimeout(function () {
-          if (currentCatObj) setMenuPhoto(currentCatObj.img, currentCatObj.cap, 'fade');
-        }, 350);
-      });
-    }
-    listEl.addEventListener('focusin', function (e) { var it = itemFrom(e); if (it) previewItem(it); });
     listEl.addEventListener('click', function (e) { openItem(itemFrom(e)); });
     listEl.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -1320,7 +1266,7 @@
   acc.intro();
 
   // Painel do cardápio
-  gsap.fromTo('.menu-panel, .menu-photo', { autoAlpha: 0, y: 40 }, {
+  gsap.fromTo('.menu-panel, .menu-spiral', { autoAlpha: 0, y: 40 }, {
     autoAlpha: 1, y: 0, duration: 1.1, ease: EASE, stagger: 0.12,
     scrollTrigger: { trigger: '.menu__grid', start: 'top 85%', toggleActions: 'play none none none' }
   });

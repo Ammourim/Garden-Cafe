@@ -594,9 +594,6 @@ figure{margin:0}
 .menu-item__vars b{color:var(--text-accent)}
 .menu-empty{padding:24px 0 8px;color:var(--mata-700)}
 
-.menu-photo{position:sticky;top:calc(var(--header-h) + 76px);width:100%;max-width:320px;justify-self:center;display:flex;flex-direction:column;align-items:center;gap:12px}
-.menu-photo__frame{width:100%;aspect-ratio:4/5;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);background:var(--creme-200)}
-.menu-photo__frame img{width:100%;height:100%;object-fit:cover}
 
 .switch{display:inline-flex;align-items:center;gap:10px;font:600 14px/1 var(--font-sans);color:var(--mata-800);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;min-height:44px}
 .switch input{position:absolute;opacity:0;pointer-events:none}
@@ -608,7 +605,6 @@ figure{margin:0}
 
 @media (max-width: 860px) {
   .menu__grid{grid-template-columns:1fr;padding-top:24px}
-  .menu-photo{display:none}
   .tabs{gap:22px}
   .menu-item__name,.menu-item__price{font-size:16px}
 }
@@ -913,7 +909,6 @@ fieldset .field__error{margin-top:10px}
 .menu-item:focus-visible{box-shadow:0 0 0 2px var(--text-accent);border-radius:8px}
 .menu-item__thumb{flex:none;width:52px;height:52px;margin-top:2px;border-radius:50%;overflow:hidden;background:var(--creme-200);box-shadow:var(--shadow-sm)}
 .menu-item__thumb img{width:100%;height:100%;object-fit:cover}
-.menu-photo__frame img{will-change:opacity,transform}
 @media (min-width: 861px){.menu-item__thumb{display:none}}
 .daily-card .dish__price{margin-top:0}
 
@@ -921,3 +916,24 @@ fieldset .field__error{margin-top:10px}
 .menu-item.is-flash{animation:menu-flash 2.4s var(--ease-out)}
 @keyframes menu-flash{0%,35%{background:rgba(217,146,90,.28);box-shadow:0 0 0 8px rgba(217,146,90,.28)}100%{background:transparent;box-shadow:0 0 0 8px transparent}}
 .menu-item.is-flash{border-radius:8px}
+
+/* Cardápio: espiral infinita com as fotos dos pratos da categoria (js/spiral.js) */
+.menu-spiral{position:sticky;top:calc(var(--header-h) + 76px);width:100%;display:flex;flex-direction:column;align-items:center;gap:6px}
+.spiral{position:relative;width:100%;height:600px;overflow:hidden;contain:strict;-webkit-user-select:none;user-select:none}
+.spiral__stage{position:absolute;inset:0}
+.spiral__card{position:absolute;left:50%;top:50%;width:var(--sp-w, 100px);height:var(--sp-h, 100px);margin:calc(var(--sp-h, 100px) / -2) 0 0 calc(var(--sp-w, 100px) / -2);border-radius:10px;overflow:hidden;background:var(--creme-200);box-shadow:0 10px 24px -14px rgba(31,42,34,.55);cursor:pointer;will-change:transform,opacity}
+.spiral__card img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .5s var(--ease-out)}
+.spiral__card img.is-in{opacity:1}
+.spiral__card.is-hover{filter:none !important}
+.spiral__empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:24px}
+.spiral__empty::before{content:"";position:absolute;width:240px;height:240px;border-radius:50%;border:1.5px dashed rgba(110,63,21,.28);left:50%;top:50%;transform:translate(-50%,-50%)}
+.spiral__empty-ic{width:64px;height:64px;fill:none;stroke:var(--oliva-600);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;margin-bottom:4px}
+.spiral__empty-title{font:400 30px/1 var(--font-script);color:var(--terracota-600)}
+.spiral__empty-text{max-width:22ch;font-size:14px;line-height:1.4;color:var(--tinta-700);opacity:.85}
+.spiral__cap{transition:opacity .25s var(--ease-out)}
+@media (max-width: 860px) {
+  .menu-spiral{position:relative;top:auto;order:-1}
+  .spiral{height:300px}
+  .spiral__empty{display:none !important}
+  .menu-spiral.is-empty{display:none}
+}

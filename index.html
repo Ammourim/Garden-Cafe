@@ -18,8 +18,8 @@
   <link rel="preconnect" href="https://lh3.googleusercontent.com">
   <link rel="preload" as="font" type="font/woff2" href="assets/fonts/playfair-display-latin.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="assets/fonts/nunito-sans-latin.woff2" crossorigin>
-  <link rel="preload" as="image" href="assets/img/xicara/xicara.webp" fetchpriority="high">
-  <link rel="stylesheet" href="css/style.css?v=10">
+  <link rel="preload" as="image" href="assets/img/cabeleira-do-zeze.webp">
+  <link rel="stylesheet" href="css/style.css?v=11">
 
   <script>
     // Ativa os estados iniciais das animações só quando há JS e o usuário não pediu menos movimento.
@@ -147,14 +147,9 @@
           </ul>
         </div>
         <div class="hero__plates" aria-hidden="true">
-          <!-- Xícara montada em camadas: pires, xícara, colher e café caem em sequência -->
-          <div class="cup" data-cup>
-            <img class="cup__final" src="assets/img/xicara/xicara.webp" alt="" width="720" height="620" fetchpriority="high">
-            <img class="cup__part" data-part="pires" src="assets/img/xicara/pires.webp" alt="" width="720" height="620" decoding="async">
-            <img class="cup__part" data-part="colher" src="assets/img/xicara/colher.webp" alt="" width="720" height="620" decoding="async">
-            <img class="cup__part" data-part="xicara" src="assets/img/xicara/xicara-vazia.webp" alt="" width="720" height="620" decoding="async">
-            <img class="cup__part" data-part="cafe" src="assets/img/xicara/cafe.webp" alt="" width="720" height="620" decoding="async">
-          </div>
+          <div class="plate plate--xl" data-plate="main"><img src="assets/img/cabeleira-do-zeze.webp" alt="" width="900" height="720" fetchpriority="high"></div>
+          <div class="plate plate--sm" data-plate="side"><img data-photo="Quiche de camarão" src="assets/img/quiche-camarao.webp" alt="" width="322" height="460"></div>
+          <div class="plate plate--xs" data-plate="tiny"><img data-photo="Croissants" src="assets/img/croissant.webp" alt="" width="212" height="176"></div>
           <span class="badge badge--oxe" data-plate="badge">Oxe! É bom demais!</span>
         </div>
       </div>
@@ -518,6 +513,6 @@
   <script src="js/vendor/gsap.min.js" defer></script>
   <script src="js/vendor/ScrollTrigger.min.js" defer></script>
   <script src="js/vendor/lenis.min.js" defer></script>
-  <script src="js/main.js?v=10" defer></script>
+  <script src="js/main.js?v=11" defer></script>
 </body>
 </html>

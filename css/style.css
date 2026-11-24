@@ -412,14 +412,6 @@ figure{margin:0}
 .plate--sm{width:clamp(150px, 15vw, 210px);aspect-ratio:1;left:2%;bottom:4%}
 .plate--xs{width:clamp(96px, 9vw, 128px);aspect-ratio:1;left:22%;top:2%;border-width:4px}
 .hero__plates .badge--oxe{position:absolute;right:6%;bottom:8%;transform:rotate(-4deg)}
-/* Xícara do hero: camadas empilhadas no mesmo quadro (720x620) */
-.cup{position:absolute;right:0;top:50%;width:min(100%, 560px);aspect-ratio:720/620;transform:translateY(-50%);filter:drop-shadow(0 28px 30px rgba(6,14,9,.45))}
-.cup img{position:absolute;inset:0;width:100%;height:100%;will-change:transform}
-.cup__final{z-index:5}
-.cup__part{z-index:1;opacity:0}
-.cup__part[data-part="colher"]{z-index:2}
-.cup__part[data-part="xicara"]{z-index:3}
-.cup__part[data-part="cafe"]{z-index:4}
 
 .hero__scroll{position:absolute;left:50%;bottom:22px;width:26px;height:42px;margin-left:-13px;border:1.5px solid rgba(246,236,218,.45);border-radius:20px}
 .hero__scroll span{position:absolute;left:50%;top:8px;width:3px;height:8px;margin-left:-1.5px;border-radius:2px;background:var(--creme-100);animation:scrollcue 2.2s var(--ease-in-out) 3}
@@ -434,7 +426,6 @@ figure{margin:0}
   .plate--sm{width:clamp(110px, 30vw, 160px);left:0;bottom:0}
   .plate--xs{width:clamp(70px, 19vw, 100px);left:16%;top:0}
   .hero__plates .badge--oxe{right:0;bottom:2%;font-size:17px}
-  .cup{right:50%;top:0;height:100%;width:auto;max-width:100%;transform:translateX(50%)}
   .hero__scroll{display:none}
   .sprig--hero{width:200px;height:200px;left:auto;right:-50px;bottom:-30px;transform:rotate(80deg)}
 }
@@ -856,7 +847,6 @@ fieldset .field__error{margin-top:10px}
 /* A foto principal começa em 1% (invisível a olho) para o Chrome contar o LCP
    assim que ela pinta, e não só no fim da animação de entrada */
 .js:not(.reduced) [data-plate="main"]{opacity:.01}
-.js:not(.reduced) .cup__final{opacity:.01}
 .js:not(.reduced) [data-split]{visibility:hidden}
 .js:not(.reduced) [data-split].is-split{visibility:visible}
 .split-line{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em;margin-bottom:-.08em}
@@ -866,7 +856,6 @@ fieldset .field__error{margin-top:10px}
 /* Fallback: se as bibliotecas de animação não carregarem, mostra tudo */
 .no-anim [data-hero="fade"],.no-anim [data-reveal],.no-anim [data-plate]{opacity:1 !important}
 .no-anim [data-split]{visibility:visible !important}
-.no-anim .cup__final{opacity:1 !important}
 .no-anim [data-clip]{clip-path:none !important}
 
 @media (prefers-reduced-motion: reduce) {

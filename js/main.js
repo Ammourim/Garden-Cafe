@@ -1102,37 +1102,15 @@
   /* ------------------------------------------------------------------------
      Abertura + entrada do hero
      ------------------------------------------------------------------------ */
-  // Xícara do hero: pires, xícara, colher e café caem do topo da tela, um de cada vez.
-  // A imagem final (com sombras) fica com opacidade .01 desde o início para contar no LCP
-  // e aparece por cima das peças quando o café assenta.
-  function cupDrop() {
-    var tl = gsap.timeline();
-    var cup = $('[data-cup]');
-    if (!cup) return tl;
-    var fall = -(cup.getBoundingClientRect().bottom + 80);
-    var drop = function (part, at, o) {
-      var el = $('[data-part="' + part + '"]', cup);
-      tl.set(el, { opacity: 1 }, at)
-        .fromTo(el, { y: fall, rotate: o.rotate || 0 }, { y: 0, rotate: 0, duration: 0.6, ease: 'power2.in' }, at)
-        .to(el, { y: -o.bounce, duration: 0.13, ease: 'power1.out' }, at + 0.6)
-        .to(el, { y: 0, duration: 0.15, ease: 'power1.in' }, at + 0.73);
-    };
-    drop('pires', 0, { bounce: 10, rotate: -4 });
-    drop('xicara', 0.5, { bounce: 8, rotate: 5 });
-    drop('colher', 0.95, { bounce: 5, rotate: -8 });
-    drop('cafe', 1.35, { bounce: 3 });
-    tl.to('.cup__final', { opacity: 1, duration: 0.45, ease: 'power2.out' }, 2.05)
-      .set('.cup__part', { opacity: 0 });
-    return tl;
-  }
-
   function heroIn(delay) {
     var tl = gsap.timeline({ delay: delay || 0 });
     var title = $('.hero__title');
     tl.to(splitMap.get(title), { yPercent: 0, duration: 1.3, ease: EASE, stagger: 0.08 }, 0)
       .fromTo('[data-hero="fade"]', { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 1.1, ease: EASE, stagger: 0.09 }, 0.15)
-      .add(cupDrop(), 0.05)
-      .fromTo('[data-plate="badge"]', { autoAlpha: 0, y: 16, rotate: -12 }, { autoAlpha: 1, y: 0, rotate: -4, duration: 1, ease: 'back.out(1.6)' }, 2.3)
+      .fromTo('[data-plate="main"]', { autoAlpha: 0.01, scale: 0.82, rotate: -18 }, { autoAlpha: 1, scale: 1, rotate: 0, duration: 1.6, ease: EASE }, 0.05)
+      .fromTo('[data-plate="side"]', { autoAlpha: 0, scale: 0.7, rotate: 14, y: 40 }, { autoAlpha: 1, scale: 1, rotate: 0, y: 0, duration: 1.5, ease: EASE }, 0.25)
+      .fromTo('[data-plate="tiny"]', { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 1.3, ease: EASE }, 0.4)
+      .fromTo('[data-plate="badge"]', { autoAlpha: 0, y: 16, rotate: -12 }, { autoAlpha: 1, y: 0, rotate: -4, duration: 1, ease: 'back.out(1.6)' }, 0.85)
       .fromTo('.hero__glow', { opacity: 0 }, { opacity: 1, duration: 1.8, ease: 'power2.out' }, 0)
       .fromTo('.sprig--hero', { autoAlpha: 0, rotate: -30 }, { autoAlpha: 1, rotate: isTouch ? 80 : -8, duration: 1.8, ease: EASE }, 0.3);
     return tl;
@@ -1250,7 +1228,9 @@
   // Desktop: parallax mais rico
   mm.add('(min-width: 861px)', function () {
     var hero = gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.8 } });
-    hero.to('.hero__plates', { yPercent: 16, ease: 'none' }, 0)
+    hero.to('[data-plate="main"]', { yPercent: 18, rotate: 10, ease: 'none' }, 0)
+      .to('[data-plate="side"]', { yPercent: -40, rotate: -12, ease: 'none' }, 0)
+      .to('[data-plate="tiny"]', { yPercent: -90, ease: 'none' }, 0)
       .to('.hero__copy', { yPercent: 14, autoAlpha: 0.2, ease: 'none' }, 0);
 
     $$('[data-speed]').forEach(function (img) {
@@ -1273,7 +1253,8 @@
   // Celular: parallax leve, só transform, para manter a fluidez
   mm.add('(max-width: 860px)', function () {
     var hero = gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.5 } });
-    hero.to('.hero__plates', { yPercent: 10, ease: 'none' }, 0);
+    hero.to('[data-plate="main"]', { yPercent: 12, rotate: 8, ease: 'none' }, 0)
+      .to('[data-plate="side"]', { yPercent: -18, ease: 'none' }, 0);
   });
 
   animReady = true;

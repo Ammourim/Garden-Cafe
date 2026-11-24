@@ -41,13 +41,13 @@
 
     function readCfg() {
       cfg = mq.matches ? extend(DESKTOP, MOBILE) : DESKTOP;
-      // Ajusta ao espaço: cards maiores e raio que preenche a largura da coluna
+      // Ajusta ao espaço mantendo as proporções da referência (card 100, raio 170,
+      // espaço 60): a hélice inteira ocupa ~4,4 cards de largura. Fugir dessa
+      // proporção faz os cards se sobreporem na hora de trocar de frente (o "pulo").
       var W = root.clientWidth;
       if (W) {
-        var card = mq.matches ? Math.round(Math.min(96, Math.max(76, W * 0.22)))
-          : Math.round(Math.min(160, Math.max(110, W * 0.3)));
-        var R = Math.round(Math.max(90, W / 2 - card * cfg.centerScale / 2 - 6));
-        cfg = extend(cfg, { cardWidth: card, cardHeight: card, radius: R, verticalSpacing: Math.round(card * 0.62) });
+        var card = Math.round(Math.min(mq.matches ? 96 : 140, Math.max(72, (W - 8) / 4.4)));
+        cfg = extend(cfg, { cardWidth: card, cardHeight: card, radius: Math.round(card * 1.7), verticalSpacing: Math.round(card * 0.6) });
       }
       root.style.setProperty('--sp-w', cfg.cardWidth + 'px');
       root.style.setProperty('--sp-h', cfg.cardHeight + 'px');
@@ -122,14 +122,17 @@
         var front = (z / R + 1) / 2;
         var center = front * (1 - v);
         var sc = depth * (1 + (cfg.centerScale - 1) * center);
-        op *= 0.4 + 0.6 * front;
+        op *= 0.45 + 0.55 * front;
         var tilt = cfg.cardTilt ? ' rotate(' + (Math.sin(th) * cfg.cardTilt) + 'deg)' : '';
         s.el.style.transform = 'translate3d(' + (x * depth).toFixed(1) + 'px,' + (y * depth).toFixed(1) + 'px,0) scale(' + sc.toFixed(3) + ')' + tilt;
         s.el.style.opacity = op.toFixed(3);
-        s.el.style.zIndex = Math.round(z + R);
+        s.el.style.zIndex = Math.round((z + R) * 10);
         // Filtros arredondados: só repinta quando o valor muda de verdade
-        var blur = Math.round(cfg.edgeBlur * (1 - front) * 2) / 2;
-        var gray = Math.round(cfg.grayscale * (1 - center) * 10) / 10;
+        // Como no vídeo: desfoque vem da distância ao centro vertical (topo e base),
+        // todos os cards em preto e branco; passos de 0,25 px para não serrilhar
+        var e = Math.max(0, (v - 0.3) / 0.7);
+        var blur = Math.round(cfg.edgeBlur * e * e * 4) / 4;
+        var gray = cfg.grayscale;
         var f = (blur ? 'blur(' + blur + 'px) ' : '') + (gray ? 'grayscale(' + gray + ')' : '');
         if (f !== s.f) { s.el.style.filter = f; s.f = f; }
         if (center > best) { best = center; bestName = s.name; }

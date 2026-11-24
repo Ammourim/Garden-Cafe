@@ -41,6 +41,14 @@
 
     function readCfg() {
       cfg = mq.matches ? extend(DESKTOP, MOBILE) : DESKTOP;
+      // Ajusta ao espaço: cards maiores e raio que preenche a largura da coluna
+      var W = root.clientWidth;
+      if (W) {
+        var card = mq.matches ? Math.round(Math.min(96, Math.max(76, W * 0.22)))
+          : Math.round(Math.min(160, Math.max(110, W * 0.3)));
+        var R = Math.round(Math.max(90, W / 2 - card * cfg.centerScale / 2 - 6));
+        cfg = extend(cfg, { cardWidth: card, cardHeight: card, radius: R, verticalSpacing: Math.round(card * 0.62) });
+      }
       root.style.setProperty('--sp-w', cfg.cardWidth + 'px');
       root.style.setProperty('--sp-h', cfg.cardHeight + 'px');
       H = root.clientHeight || 600;

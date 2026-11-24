@@ -434,7 +434,7 @@
         }
       });
     }, { rootMargin: '-45% 0px -50% 0px' });
-    ['sugestao', 'cardapio', 'eventos', 'reservas', 'onde'].forEach(function (id) {
+    ['sugestao', 'cardapio', 'historias', 'eventos', 'reservas', 'onde'].forEach(function (id) {
       var s = document.getElementById(id); if (s) io.observe(s);
     });
   }
@@ -1128,6 +1128,17 @@
     });
   }
 
+  // Histórias: holofote que segue o mouse em cada ato (só com mouse)
+  if (!isTouch) {
+    $$('[data-spot]').forEach(function (el) {
+      el.addEventListener('pointermove', function (e) {
+        var r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+        el.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+      });
+    });
+  }
+
   /* ------------------------------------------------------------------------
      Sem GSAP ou com "reduzir movimento": encerra aqui (tudo já está visível)
      ------------------------------------------------------------------------ */
@@ -1302,6 +1313,18 @@
     autoAlpha: 1, rotate: 0, scale: 1, duration: 1.6, ease: EASE,
     scrollTrigger: { trigger: '.about', start: 'top 75%', toggleActions: 'play none none none' }
   });
+
+  // Histórias em cena: as cortinas se abrem conforme a seção entra na tela
+  if ($('.stories')) {
+    gsap.fromTo('.stories__curtain--l', { xPercent: 0 }, {
+      xPercent: -100, ease: 'power1.inOut',
+      scrollTrigger: { trigger: '.stories', start: 'top 85%', end: 'top 25%', scrub: 0.8 }
+    });
+    gsap.fromTo('.stories__curtain--r', { xPercent: 0 }, {
+      xPercent: 100, ease: 'power1.inOut',
+      scrollTrigger: { trigger: '.stories', start: 'top 85%', end: 'top 25%', scrub: 0.8 }
+    });
+  }
 
   // Rodapé: wordmark grande sobe e cresce
   gsap.fromTo('[data-big]', { yPercent: 40, scale: 0.92 }, {

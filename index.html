@@ -19,7 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" href="assets/fonts/playfair-display-latin.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="assets/fonts/nunito-sans-latin.woff2" crossorigin>
   <link rel="preload" as="image" href="assets/img/cabeleira-do-zeze.webp">
-  <link rel="stylesheet" href="css/style.css?v=16">
+  <link rel="stylesheet" href="css/style.css?v=17">
 
   <script>
     // Ativa os estados iniciais das animações só quando há JS e o usuário não pediu menos movimento.
@@ -76,6 +76,7 @@
       <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/><path d="M6 2v2"/></symbol>
       <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
       <!-- Ramo botânico de traço fino usado como floreio -->
+      <symbol id="i-masks" viewBox="0 0 24 24"><path d="M2 4.5c2.6 1 5.4 1 8 0v5.2c0 2.6-1.8 4.6-4 4.6s-4-2-4-4.6Z"/><path d="M4.2 8h.01"/><path d="M7.8 8h.01"/><path d="M4.4 11c.9.8 2.3.8 3.2 0"/><path d="M12.6 10.2c2.7.7 5.6.5 8.2-.6l.6 5.2c.3 2.6-1.3 4.8-3.5 5.1s-4.3-1.5-4.6-4.1Z"/><path d="M15.2 13.4h.01"/><path d="M18.8 13h.01"/><path d="M15.9 17.2c.8-.9 2.2-1.1 3.2-.4"/></symbol>
       <symbol id="i-sprig" viewBox="0 0 120 120"><path d="M14 108C40 84 62 58 104 14"/><path d="M34 88c-10-4-18-14-18-26 12 2 20 12 18 26Z"/><path d="M34 88c4-10 14-16 26-14-4 12-14 16-26 14Z"/><path d="M54 66c-9-5-14-15-12-27 11 4 16 15 12 27Z"/><path d="M54 66c5-9 15-14 27-11-5 11-15 14-27 11Z"/><path d="M74 44c-7-6-10-16-6-27 10 6 12 17 6 27Z"/><path d="M74 44c6-8 17-11 27-6-6 10-17 11-27 6Z"/></symbol>
     </defs>
   </svg>
@@ -100,6 +101,7 @@
       <nav class="nav" aria-label="Principal">
         <a href="#sugestao">Sugestão do dia</a>
         <a href="#cardapio">Cardápio</a>
+        <a href="#historias">Histórias</a>
         <a href="#eventos">Eventos</a>
         <a href="#onde">Onde estamos</a>
       </nav>
@@ -116,8 +118,9 @@
       <a href="#inicio"><small>01</small>Início</a>
       <a href="#sugestao"><small>02</small>Sugestão do dia</a>
       <a href="#cardapio"><small>03</small>Cardápio</a>
-      <a href="#eventos"><small>04</small>Eventos</a>
-      <a href="#onde"><small>05</small>Onde estamos</a>
+      <a href="#historias"><small>04</small>Histórias</a>
+      <a href="#eventos"><small>05</small>Eventos</a>
+      <a href="#onde"><small>06</small>Onde estamos</a>
     </nav>
     <div class="drawer__foot">
       <p><svg class="ic"><use href="#i-clock"/></svg>Todos os dias, 15h às 22h</p>
@@ -277,6 +280,47 @@
           <figure class="frame frame--tall" data-clip><img data-photo="Maria Bonita" src="assets/img/maria-bonita.webp" alt="Sobremesa Maria Bonita servida no salão do Garden" width="333" height="460" loading="lazy" data-speed="-0.06"></figure>
           <figure class="frame frame--short" data-clip><img src="assets/img/reel-fachada.webp" alt="Fachada verde do Garden Café com toldo creme" width="185" height="234" loading="lazy" data-speed="0.06"></figure>
           <img class="about__badge" src="assets/img/garden-flower-badge-256.webp" alt="" width="120" height="120" loading="lazy" data-spin>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTÓRIAS EM CENA (minipeças teatrais sobre Pernambuco) -->
+    <section class="stories" id="historias" aria-labelledby="stories-title">
+      <div class="stories__curtain stories__curtain--l" aria-hidden="true"></div>
+      <div class="stories__curtain stories__curtain--r" aria-hidden="true"></div>
+      <div class="stories__valance" aria-hidden="true"></div>
+      <div class="container">
+        <div class="stories__head">
+          <span class="eyebrow eyebrow--deep" data-reveal><svg class="ic"><use href="#i-masks"/></svg>Minipeças no Garden</span>
+          <h2 id="stories-title" data-split>Histórias de Pernambuco</h2>
+          <span class="script-accent" data-reveal>em cena</span>
+          <p class="stories__lead" data-reveal>Entre um café e outro, o salão vira palco. A gente encena minipeças sobre as histórias da nossa terra.</p>
+        </div>
+
+        <ol class="stories__list">
+          <li class="story" data-reveal data-spot>
+            <span class="story__act">Ato I</span>
+            <h3 class="story__title">O boi voador</h3>
+            <span class="story__rule" aria-hidden="true"></span>
+            <p>Você conhece a história do famoso boi voador da antiga Cidade Maurícia? Sabe como ele fez parte da história da arquitetura atual da cidade?</p>
+          </li>
+          <li class="story" data-reveal data-spot>
+            <span class="story__act">Ato II</span>
+            <h3 class="story__title">O Homem da Meia-Noite</h3>
+            <span class="story__rule" aria-hidden="true"></span>
+            <p>Todo mundo já ouviu falar do bloco Homem da Meia-Noite, mas será que a gente sabe mesmo de onde veio essa ideia e como ele chegou onde está hoje em dia?</p>
+          </li>
+          <li class="story" data-reveal data-spot>
+            <span class="story__act">Ato III</span>
+            <h3 class="story__title">Quem é o Leão do Norte?</h3>
+            <span class="story__rule" aria-hidden="true"></span>
+            <p>De onde vem essa alcunha dada ao nosso estado de Leão do Norte? Como esse "apelido" reflete a história de luta e força da população de Pernambuco?</p>
+          </li>
+        </ol>
+
+        <div class="stories__ctas" data-reveal>
+          <a class="btn btn--cream" href="https://www.instagram.com/gardencafepe/" target="_blank" rel="noopener"><svg class="ic"><use href="#i-instagram"/></svg>Acompanhe as próximas sessões</a>
+          <a class="btn btn--outline-cream" href="#reservas" data-reserve="Evento"><svg class="ic"><use href="#i-calendar"/></svg>Reservar mesa</a>
         </div>
       </div>
     </section>
@@ -526,6 +570,6 @@
   <script src="js/vendor/ScrollTrigger.min.js" defer></script>
   <script src="js/vendor/lenis.min.js" defer></script>
   <script src="js/spiral.js?v=3" defer></script>
-  <script src="js/main.js?v=14" defer></script>
+  <script src="js/main.js?v=15" defer></script>
 </body>
 </html>

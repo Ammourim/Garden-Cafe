@@ -328,11 +328,25 @@ var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1baBXoCkya-1MZCMe
     });
   }
 
+  function cachedEntry() {
+    try { return JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch (e) { return null; }
+  }
   function cached() {
-    try {
-      var o = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
-      return o && o.c ? o.c : null;
-    } catch (e) { return null; }
+    var o = cachedEntry();
+    return o && o.c ? o.c : null;
+  }
+
+  // Busca a planilha uma vez por página e começa já, sem esperar as
+  // bibliotecas de animação. Se a cópia salva tem menos de 5 minutos, não
+  // chama o Google de novo (quem navega e volta não repete as 6 requisições).
+  var FRESH_MS = 5 * 60 * 1000;
+  var started = null;
+  function fetchFresh() {
+    if (started) return started;
+    var o = cachedEntry();
+    var fresh = o && o.c && o.t && Date.now() - o.t >= 0 && Date.now() - o.t < FRESH_MS;
+    started = fresh ? Promise.resolve(null) : fetchAll();
+    return started;
   }
 
   /* --------------------------------------------------- Links de imagem */
@@ -374,11 +388,13 @@ var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1baBXoCkya-1MZCMe
   window.GardenSheet = {
     url: GARDEN_SHEET_URL,
     cached: cached,
-    fetch: fetchAll,
+    fetch: fetchFresh,
     imageUrl: imageUrl,
     imageSrcset: imageSrcset,
     _parseCsv: parseCsv,
     _build: build,
     norm: norm
   };
+
+  fetchFresh();
 })();

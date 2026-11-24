@@ -429,10 +429,29 @@
   var menuEl = $('#cardapio');
   var footerEl = $('.footer');
 
+  // Posição das seções que escondem a barra do celular: lida por
+  // IntersectionObserver (sem medir o layout a cada quadro da rolagem)
+  var zone = { reserve: false, footer: false, menu: false };
+  var heroLimit = heroEl ? heroEl.offsetHeight * 0.6 : 400;
+  window.addEventListener('resize', function () { heroLimit = heroEl ? heroEl.offsetHeight * 0.6 : 400; }, { passive: true });
+  if (mobileCta && 'IntersectionObserver' in window) {
+    var watchZone = function (el, key, margin) {
+      if (!el) return;
+      new IntersectionObserver(function (entries) {
+        zone[key] = entries[entries.length - 1].isIntersecting;
+        if (!ticking) { requestAnimationFrame(onScroll); ticking = true; }
+      }, { rootMargin: margin }).observe(el);
+    };
+    watchZone(reserveEl, 'reserve', '-30% 0px -30% 0px');
+    watchZone(footerEl, 'footer', '0px');
+    watchZone(menuEl, 'menu', '-40% 0px -40% 0px');
+  }
+  var ctaShown = null;
+
   function onScroll() {
     var y = window.pageYOffset;
     var down = y > lastY;
-    var past = y > (heroEl ? heroEl.offsetHeight * 0.6 : 400);
+    var past = y > heroLimit;
     if (!drawer.classList.contains('is-open') && Date.now() > headerLockUntil) {
       var hide = down && y > 160 && Math.abs(y - lastY) > 2;
       if (hide !== header.classList.contains('is-hidden') && Math.abs(y - lastY) > 2) {
@@ -442,22 +461,19 @@
       if (y < 160) { header.classList.remove('is-hidden'); document.body.classList.remove('header-hidden'); }
     }
     if (mobileCta) {
-      var vh = window.innerHeight;
-      var rr = reserveEl.getBoundingClientRect();
-      var fr = footerEl.getBoundingClientRect();
-      var inReserve = rr.top < vh * 0.7 && rr.bottom > vh * 0.3;
-      var inFooter = fr.top < vh;
       // Dentro do cardápio a barra sairia da frente dos itens e repetiria o botão "Cardápio"
-      var mr = menuEl ? menuEl.getBoundingClientRect() : null;
-      var inMenu = mr ? (mr.top < vh * 0.6 && mr.bottom > vh * 0.4) : false;
-      var show = past && !inReserve && !inFooter && !inMenu;
-      mobileCta.classList.toggle('is-visible', show);
-      $$('a', mobileCta).forEach(function (a) { a.tabIndex = show ? 0 : -1; });
-      mobileCta.setAttribute('aria-hidden', String(!show));
+      var show = past && !zone.reserve && !zone.footer && !zone.menu;
+      if (show !== ctaShown) {
+        ctaShown = show;
+        mobileCta.classList.toggle('is-visible', show);
+        Array.prototype.forEach.call(mobileCta.querySelectorAll('a'), function (el) { el.tabIndex = show ? 0 : -1; });
+        mobileCta.setAttribute('aria-hidden', String(!show));
+      }
     }
     lastY = y;
     ticking = false;
   }
+
   window.addEventListener('scroll', function () {
     if (!ticking) { requestAnimationFrame(onScroll); ticking = true; }
   }, { passive: true });

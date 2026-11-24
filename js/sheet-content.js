@@ -7,7 +7,7 @@
 
 /* Link da planilha. Para trocar de planilha, cole aqui o link dela
    (a planilha precisa estar compartilhada como "Qualquer pessoa com o link: Leitor"). */
-var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1NtZeOmPjTaGC88BGaNR-E2PAjkM5fF6hFjpAHAPLTj4/edit';
+var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1baBXoCkya-1MZCMec2_G42kbgzMGsVDlxKAxtQQ2qRc/edit';
 
 (function () {
   'use strict';
@@ -20,7 +20,7 @@ var GARDEN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1NtZeOmPjTaGC88BG
     daily: 'Sugestão do dia',
     promos: 'Promoções'
   };
-  var CACHE_KEY = 'garden-sheet-v2';
+  var CACHE_KEY = 'garden-sheet-v3';
   var TIMEOUT = 8000;
 
   function sheetId(url) {

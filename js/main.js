@@ -910,7 +910,7 @@
     if (!els.length || !animReady || !hasGsap || reduced) return;
     gsap.fromTo(els, { autoAlpha: 0, y: 30 }, {
       autoAlpha: 1, y: 0, duration: 1, ease: EASE, stagger: 0.08,
-      scrollTrigger: { trigger: els[0], start: 'top 92%', once: true }
+      scrollTrigger: { trigger: els[0], start: 'top 92%', toggleActions: 'play none none none' }
     });
   }
 
@@ -1149,15 +1149,20 @@
     if (el.classList.contains('hero__title')) return;
     gsap.to(words, {
       yPercent: 0, duration: 1.2, ease: EASE, stagger: 0.07,
-      scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
     });
   });
 
   // Revelações suaves em lote
+  // Sem "once: true": no GSAP 3.12.5, vários gatilhos "once" criados com a página
+  // já rolada (recarregar no meio, ex.: em #reservas) se matam durante o refresh e
+  // quebram o ScrollTrigger ("reading 'pin'"), deixando o resto invisível.
+  // Cada elemento é marcado e só anima na primeira vez.
   ScrollTrigger.batch('[data-reveal]', {
     start: 'top 90%',
-    once: true,
     onEnter: function (batch) {
+      batch = batch.filter(function (el) { return !el._revealed && (el._revealed = true); });
+      if (!batch.length) return;
       gsap.fromTo(batch, { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 1.1, ease: EASE, stagger: 0.1, overwrite: true });
     }
   });
@@ -1165,7 +1170,7 @@
   // Imagens que se revelam de baixo para cima
   $$('[data-clip]').forEach(function (el) {
     var img = $('img', el);
-    var tl = gsap.timeline({ scrollTrigger: { trigger: el, start: 'top 85%', once: true } });
+    var tl = gsap.timeline({ scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' } });
     tl.to(el, { clipPath: 'inset(0% 0 0 0)', duration: 1.4, ease: 'expo.inOut' });
     if (img) tl.fromTo(img, { scale: 1.25 }, { scale: 1, duration: 1.8, ease: EASE }, 0);
   });
@@ -1173,13 +1178,13 @@
   // Cards de delícias: entrada escalonada
   gsap.fromTo('.dish', { autoAlpha: 0, y: 60 }, {
     autoAlpha: 1, y: 0, duration: 1.2, ease: EASE, stagger: 0.12,
-    scrollTrigger: { trigger: '.delights__rail', start: 'top 85%', once: true }
+    scrollTrigger: { trigger: '.delights__rail', start: 'top 85%', toggleActions: 'play none none none' }
   });
 
   // Painel do cardápio
   gsap.fromTo('.menu-panel, .menu-photo', { autoAlpha: 0, y: 40 }, {
     autoAlpha: 1, y: 0, duration: 1.1, ease: EASE, stagger: 0.12,
-    scrollTrigger: { trigger: '.menu__grid', start: 'top 85%', once: true }
+    scrollTrigger: { trigger: '.menu__grid', start: 'top 85%', toggleActions: 'play none none none' }
   });
 
   // Manifesto: palavras acendem conforme a rolagem
@@ -1211,7 +1216,7 @@
   // Floreio botânico
   gsap.fromTo('.sprig--about', { autoAlpha: 0, rotate: -20, scale: 0.85 }, {
     autoAlpha: 1, rotate: 0, scale: 1, duration: 1.6, ease: EASE,
-    scrollTrigger: { trigger: '.about', start: 'top 75%', once: true }
+    scrollTrigger: { trigger: '.about', start: 'top 75%', toggleActions: 'play none none none' }
   });
 
   // Rodapé: wordmark grande sobe e cresce

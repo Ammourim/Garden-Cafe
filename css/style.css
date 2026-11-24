@@ -515,9 +515,11 @@ figure{margin:0}
 .dish__price{margin-top:auto;font:700 17px/1 var(--font-sans);color:var(--text-accent)}
 
 @media (max-width: 1020px) {
-  .delights__rail{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px var(--gutter) 18px;margin:0 calc(var(--gutter) * -1) 28px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+  .delights__rail{display:flex;justify-content:flex-start;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gutter);padding:4px var(--gutter) 18px;margin:0 calc(var(--gutter) * -1) 28px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
   .delights__rail::-webkit-scrollbar{display:none}
-  .dish{flex:0 0 min(72vw, 300px);scroll-snap-align:start;scroll-margin-left:var(--gutter)}
+  .dish{flex:0 0 min(78vw, 300px);scroll-snap-align:start;scroll-snap-stop:always}
+  .dish .muted{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  .dish .badge--plate{max-width:100%;overflow-wrap:anywhere}
 }
 
 /* --------------------------------------------------------------------------

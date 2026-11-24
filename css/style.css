@@ -500,23 +500,61 @@ figure{margin:0}
    -------------------------------------------------------------------------- */
 .delights{background:var(--bg-page);padding:var(--section-y) 0}
 .delights .section-title{margin-bottom:clamp(32px, 4vw, 52px)}
-.delights__rail{display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 280px));justify-content:center;gap:20px;margin-bottom:72px}
-.dish{display:flex}
-.dish__btn{display:flex;flex-direction:column;width:100%;text-align:left;padding:0;border:1px solid var(--border-subtle);background:var(--surface-card);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);cursor:pointer;transition:box-shadow var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out);-webkit-tap-highlight-color:transparent}
-.dish__btn:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
-.dish__btn:active{transform:scale(.985)}
-.dish__img{display:block;aspect-ratio:4/5;overflow:hidden;background:var(--creme-200)}
-.dish__img img{width:100%;height:100%;object-fit:cover;transition:transform var(--dur-slow) var(--ease-out)}
-.dish__btn:hover .dish__img img{transform:scale(1.03)}
-.dish__body{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:16px;flex:1}
 .dish__price{margin-top:auto;font:700 17px/1 var(--font-sans);color:var(--text-accent)}
 
+/* Galeria sanfona (AccordionGallery recriada em CSS + JS puro)
+   Valores pedidos: altura 460, espaço 10, raio 16, aberta = 52% da largura.
+   Cores adaptadas ao site: sombra verde-mata no lugar do #060010,
+   texto creme e destaque terracota no lugar do branco puro. */
+.acc{--acc-h:460px;--acc-gap:10px;--acc-r:16px;--acc-grow:2.17;--acc-ease:cubic-bezier(.215,.61,.355,1);--acc-dur:.6s;
+  --acc-overlay:15,31,21;--acc-text:var(--creme-50);--acc-accent:var(--terracota-300);
+  display:flex;gap:var(--acc-gap);height:var(--acc-h);margin-bottom:72px}
+.acc__item{position:relative;flex:1 1 0;min-width:0;min-height:0;border-radius:var(--acc-r);overflow:hidden;background:var(--mata-900);isolation:isolate;transition:flex-grow var(--acc-dur) var(--acc-ease)}
+.acc.is-js .acc__item{transition:none}
+.acc__item.is-active{flex-grow:var(--acc-grow)}
+.acc__link{position:absolute;inset:0;display:block;color:var(--acc-text);text-decoration:none;-webkit-tap-highlight-color:transparent;outline:none;perspective:900px}
+.acc__link:hover{color:var(--acc-text)}
+.acc__link:focus-visible{box-shadow:inset 0 0 0 3px var(--acc-accent);border-radius:var(--acc-r)}
+.acc__media{position:absolute;inset:-7%;display:block;will-change:transform}
+.acc__media img{width:100%;height:100%;object-fit:cover;object-position:50% 62%;filter:grayscale(1) brightness(.82);transition:filter var(--acc-dur) var(--acc-ease)}
+.acc__item.is-active .acc__media img{filter:none}
+.acc__link::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(to top, rgba(var(--acc-overlay),.88) 0%, rgba(var(--acc-overlay),.35) 42%, rgba(var(--acc-overlay),.15) 100%);
+  transition:opacity var(--acc-dur) var(--acc-ease)}
+.acc__item.is-active .acc__link::after{background:linear-gradient(to top, rgba(var(--acc-overlay),.9) 0%, rgba(var(--acc-overlay),.45) 34%, rgba(var(--acc-overlay),0) 62%)}
+/* Rótulo da faixa fechada: em pé, de baixo para cima */
+.acc__tag{position:absolute;z-index:2;left:50%;bottom:22px;writing-mode:vertical-rl;transform:translateX(-50%) rotate(180deg);white-space:nowrap;max-height:calc(100% - 44px);overflow:hidden;text-overflow:ellipsis;
+  font:600 15px/1 var(--font-condensed);letter-spacing:.14em;text-transform:uppercase;color:var(--acc-text);transition:opacity .3s var(--acc-ease)}
+.acc__item.is-active .acc__tag{opacity:0}
+/* Texto da foto aberta */
+.acc__body{position:absolute;z-index:2;left:0;bottom:0;width:100%;min-width:300px;max-width:520px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:clamp(20px, 2.4vw, 30px)}
+.acc__body > *{opacity:0;transform:translateY(14px);transition:opacity .25s ease,transform .25s ease}
+.acc__item.is-active .acc__body > *{opacity:1;transform:none;transition:opacity .45s var(--acc-ease) .22s,transform .6s var(--acc-ease) .22s}
+.acc__item.is-active .acc__body > :nth-child(2){transition-delay:.28s}
+.acc__item.is-active .acc__body > :nth-child(3){transition-delay:.34s}
+.acc__name{position:relative;padding-top:14px;font:700 clamp(26px, 2.6vw, 36px)/1.05 var(--font-serif);letter-spacing:-.01em;text-wrap:balance}
+.acc__name::before{content:"";position:absolute;left:0;top:0;width:36px;height:3px;border-radius:2px;background:var(--acc-accent)}
+.acc__desc{font-size:15px;line-height:1.45;color:var(--creme-150);max-width:40ch;text-wrap:pretty}
+.acc__foot{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.acc__price{font:700 18px/1 var(--font-sans);color:var(--acc-accent)}
+.acc__cta{display:inline-flex;align-items:center;gap:6px;font:700 14px/1 var(--font-sans);color:var(--acc-text)}
+.acc__cta .ic{transition:transform var(--dur-base) var(--ease-out)}
+.acc__link:hover .acc__cta .ic{transform:translateX(3px)}
+.acc__item:not(.is-active) .acc__link{cursor:pointer}
+
 @media (max-width: 1020px) {
-  .delights__rail{display:flex;justify-content:flex-start;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gutter);padding:4px var(--gutter) 18px;margin:0 calc(var(--gutter) * -1) 28px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
-  .delights__rail::-webkit-scrollbar{display:none}
-  .dish{flex:0 0 min(78vw, 300px);scroll-snap-align:start;scroll-snap-stop:always}
-  .dish .muted{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
-  .dish .badge--plate{max-width:100%;overflow-wrap:anywhere}
+  .acc{--acc-h:420px}
+}
+/* Celular: sem hover; vira coluna e abre com toque */
+@media (max-width: 720px) {
+  .acc{flex-direction:column;height:max(500px, calc((var(--acc-n, 3) - 1) * 70px / .48));margin-bottom:28px}
+  .acc__tag{left:20px;right:20px;bottom:auto;top:50%;writing-mode:horizontal-tb;transform:translateY(-50%);max-height:none;font-size:16px}
+  .acc__link::after{background:linear-gradient(to right, rgba(var(--acc-overlay),.8) 0%, rgba(var(--acc-overlay),.35) 100%)}
+  .acc__body{min-width:0;max-width:none}
+  .acc__desc{font-size:14px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+}
+@media (prefers-reduced-motion: reduce) {
+  .acc__item,.acc__media img,.acc__body > *,.acc__tag{transition:none !important}
 }
 
 /* --------------------------------------------------------------------------
@@ -878,3 +916,8 @@ fieldset .field__error{margin-top:10px}
 .menu-photo__frame img{will-change:opacity,transform}
 @media (min-width: 861px){.menu-item__thumb{display:none}}
 .daily-card .dish__price{margin-top:0}
+
+/* Prato aberto a partir da galeria das Delícias: destaque breve no cardápio */
+.menu-item.is-flash{animation:menu-flash 2.4s var(--ease-out)}
+@keyframes menu-flash{0%,35%{background:rgba(217,146,90,.28);box-shadow:0 0 0 8px rgba(217,146,90,.28)}100%{background:transparent;box-shadow:0 0 0 8px transparent}}
+.menu-item.is-flash{border-radius:8px}

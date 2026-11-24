@@ -19,7 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" href="assets/fonts/playfair-display-latin.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="assets/fonts/nunito-sans-latin.woff2" crossorigin>
   <link rel="preload" as="image" href="assets/img/cabeleira-do-zeze.webp">
-  <link rel="stylesheet" href="css/style.css?v=12">
+  <link rel="stylesheet" href="css/style.css?v=13">
 
   <script>
     // Ativa os estados iniciais das animações só quando há JS e o usuário não pediu menos movimento.
@@ -188,24 +188,30 @@
         <div class="section-title" data-reveal>
           <h2 id="delights-title" data-split>Delícias do nosso Nordeste</h2>
         </div>
-        <div class="delights__rail" role="list">
-          <article class="dish" role="listitem" data-dish='{"name":"Maria Bonita","desc":"Torrada de bolo de rolo, sorvete de nata goiaba e creme de queijo do reino.","price":"R$ 23","img":"maria-bonita"}'>
-            <button class="dish__btn" type="button" aria-label="Ver detalhes: Maria Bonita">
-              <span class="dish__img"><img data-photo="Maria Bonita" src="assets/img/maria-bonita.webp" alt="Maria Bonita: bolo de rolo com sorvete e goiabada" width="333" height="460" loading="lazy"></span>
-              <span class="dish__body"><span class="badge badge--plate">Maria Bonita</span><span class="muted">Torrada de bolo de rolo, sorvete de nata goiaba e creme de queijo do reino</span><span class="dish__price">R$ 23</span></span>
-            </button>
+        <!-- Galeria sanfona: a foto em foco abre, as outras ficam em faixas.
+             Desktop: passar o mouse. Celular: toque (vira coluna). O JS recria a
+             lista a partir da planilha (aba Destaques) e liga as animações. -->
+        <div class="acc" role="list" data-acc>
+          <article class="acc__item" role="listitem">
+            <a class="acc__link" href="#cardapio" data-dish-name="Maria Bonita" aria-label="Maria Bonita, R$ 23: ver no cardápio">
+              <span class="acc__media"><img data-photo="Maria Bonita" src="assets/img/maria-bonita.webp" alt="Maria Bonita: bolo de rolo com sorvete e goiabada" width="333" height="460" loading="lazy" decoding="async"></span>
+              <span class="acc__tag" aria-hidden="true">Maria Bonita</span>
+              <span class="acc__body"><span class="acc__name">Maria Bonita</span><span class="acc__desc">Torrada de bolo de rolo, sorvete de nata goiaba e creme de queijo do reino</span><span class="acc__foot"><span class="acc__price">R$ 23</span><span class="acc__cta">Ver no cardápio<svg class="ic"><use href="#i-arrow-right"/></svg></span></span></span>
+            </a>
           </article>
-          <article class="dish" role="listitem" data-dish='{"name":"Cabeleira do Zezé","desc":"Cuscuz doce com doce de leite, queijo manteiga e banana caramelizada, coberto com doce de leite e fios de casca de banana frita.","price":"R$ 29","img":"cabeleira-do-zeze"}'>
-            <button class="dish__btn" type="button" aria-label="Ver detalhes: Cabeleira do Zezé">
-              <span class="dish__img"><img data-photo="Cabeleira do Zezé" src="assets/img/cabeleira-do-zeze.webp" alt="Cuscuz doce Cabeleira do Zezé em prato colorido" width="900" height="720" loading="lazy"></span>
-              <span class="dish__body"><span class="badge badge--plate">Cabeleira do Zezé</span><span class="muted">Doce de leite, queijo manteiga e banana caramelizada</span><span class="dish__price">R$ 29</span></span>
-            </button>
+          <article class="acc__item" role="listitem">
+            <a class="acc__link" href="#cardapio" data-dish-name="Cabeleira do Zezé" aria-label="Cabeleira do Zezé, R$ 29: ver no cardápio">
+              <span class="acc__media"><img data-photo="Cabeleira do Zezé" src="assets/img/cabeleira-do-zeze.webp" alt="Cuscuz doce Cabeleira do Zezé em prato colorido" width="900" height="720" loading="lazy" decoding="async"></span>
+              <span class="acc__tag" aria-hidden="true">Cabeleira do Zezé</span>
+              <span class="acc__body"><span class="acc__name">Cabeleira do Zezé</span><span class="acc__desc">Doce de leite, queijo manteiga e banana caramelizada</span><span class="acc__foot"><span class="acc__price">R$ 29</span><span class="acc__cta">Ver no cardápio<svg class="ic"><use href="#i-arrow-right"/></svg></span></span></span>
+            </a>
           </article>
-          <article class="dish" role="listitem" data-dish='{"name":"Quiche de camarão","desc":"Massa delicada, recheio caprichado e aquele sabor arretado que conquista logo na primeira mordida.","price":"R$ 20","img":"quiche-camarao"}'>
-            <button class="dish__btn" type="button" aria-label="Ver detalhes: Quiche de camarão">
-              <span class="dish__img"><img data-photo="Quiche de camarão" src="assets/img/quiche-camarao.webp" alt="Quiche de camarão" width="322" height="460" loading="lazy"></span>
-              <span class="dish__body"><span class="badge badge--plate">Quiche de camarão</span><span class="muted">Massa delicada, recheio caprichado</span><span class="dish__price">R$ 20</span></span>
-            </button>
+          <article class="acc__item is-active" role="listitem">
+            <a class="acc__link" href="#cardapio" data-dish-name="Quiche de camarão" aria-label="Quiche de camarão, R$ 20: ver no cardápio">
+              <span class="acc__media"><img data-photo="Quiche de camarão" src="assets/img/quiche-camarao.webp" alt="Quiche de camarão" width="322" height="460" loading="lazy" decoding="async"></span>
+              <span class="acc__tag" aria-hidden="true">Quiche de camarão</span>
+              <span class="acc__body"><span class="acc__name">Quiche de camarão</span><span class="acc__desc">Massa delicada, recheio caprichado</span><span class="acc__foot"><span class="acc__price">R$ 20</span><span class="acc__cta">Ver no cardápio<svg class="ic"><use href="#i-arrow-right"/></svg></span></span></span>
+            </a>
           </article>
         </div>
         <div class="center" data-reveal><a class="btn btn--secondary" href="#cardapio">Cardápio completo<svg class="ic"><use href="#i-arrow-right"/></svg></a></div>
@@ -513,6 +519,6 @@
   <script src="js/vendor/gsap.min.js" defer></script>
   <script src="js/vendor/ScrollTrigger.min.js" defer></script>
   <script src="js/vendor/lenis.min.js" defer></script>
-  <script src="js/main.js?v=11" defer></script>
+  <script src="js/main.js?v=12" defer></script>
 </body>
 </html>

@@ -81,7 +81,7 @@
     img.src = imgUrl(src, w);
   }
   var SIZES = {
-    dish: '(max-width: 860px) 70vw, 300px',
+    acc: '(max-width: 720px) 92vw, 640px',
     event: '(max-width: 860px) 92vw, 420px',
     daily: '180px',
     photo: '(max-width: 860px) 92vw, 480px',
@@ -519,12 +519,6 @@
     if (lenis) lenis.start();
     setTimeout(function () { dialog.hidden = true; if (lastFocus) lastFocus.focus(); }, reduced ? 0 : 380);
   }
-  document.addEventListener('click', function (e) {
-    var btn = e.target.closest('.dish__btn');
-    if (!btn) return;
-    var d = btn.closest('.dish');
-    try { openDialog(JSON.parse(d.getAttribute('data-dish'))); } catch (err) {}
-  });
   if (dialog) {
     dialog.addEventListener('click', function (e) {
       if (e.target.closest('[data-close]')) closeDialog();
@@ -915,20 +909,173 @@
   }
 
   function renderHighlights(list, initial) {
-    var rail = $('.delights__rail');
+    var rail = $('[data-acc]');
     if (!rail || !list || !list.length) return;
+    var arrow = '<svg class="ic"><use href="#i-arrow-right"/></svg>';
     rail.innerHTML = list.map(function (d) {
       var price = priceText(d.price);
-      var data = { name: d.name, desc: d.desc || d.short || '', price: price, img: d.img || 'maria-bonita' };
-      return '<article class="dish" role="listitem" data-dish="' + escapeHtml(JSON.stringify(data)) + '">' +
-        '<button class="dish__btn" type="button" aria-label="Ver detalhes: ' + escapeHtml(d.name) + '">' +
-        '<span class="dish__img"><img src="' + escapeHtml(imgUrl(data.img, 700)) + '"' + srcsetAttr(data.img, SIZES.dish) + ' alt="' + escapeHtml(d.name) + '" width="600" height="600" loading="lazy"></span>' +
-        '<span class="dish__body"><span class="badge badge--plate">' + escapeHtml(d.name) + '</span>' +
-        (d.short ? '<span class="muted">' + escapeHtml(d.short) + '</span>' : '') +
-        (price ? '<span class="dish__price">' + escapeHtml(price) + '</span>' : '') +
-        '</span></button></article>';
+      var img = d.img || 'maria-bonita';
+      var label = d.name + (price ? ', ' + price : '') + ': ver no cardápio';
+      return '<article class="acc__item" role="listitem">' +
+        '<a class="acc__link" href="#cardapio" data-dish-name="' + escapeHtml(d.name) + '" aria-label="' + escapeHtml(label) + '">' +
+        '<span class="acc__media"><img src="' + escapeHtml(imgUrl(img, 720)) + '"' + srcsetAttr(img, SIZES.acc) + ' alt="' + escapeHtml(d.name) + '" width="720" height="900" loading="lazy" decoding="async"></span>' +
+        '<span class="acc__tag" aria-hidden="true">' + escapeHtml(d.name) + '</span>' +
+        '<span class="acc__body"><span class="acc__name">' + escapeHtml(d.name) + '</span>' +
+        (d.short ? '<span class="acc__desc">' + escapeHtml(d.short) + '</span>' : '') +
+        '<span class="acc__foot">' + (price ? '<span class="acc__price">' + escapeHtml(price) + '</span>' : '') +
+        '<span class="acc__cta">Ver no cardápio' + arrow + '</span></span></span></a></article>';
     }).join('');
-    if (!initial) revealNew($$('.dish', rail));
+    acc.refresh();
+    if (!initial) revealNew($$('.acc__item', rail));
+  }
+
+  /* ------------------------------------------------------------------------
+     Galeria sanfona das Delícias (recriação da AccordionGallery em JS puro)
+     Desktop: abre ao passar o mouse, com parallax e inclinação da foto.
+     Toque: o 1º toque abre a faixa, o 2º leva ao prato no cardápio.
+     ------------------------------------------------------------------------ */
+  var acc = (function () {
+    var OPT = { defaultIndex: 2, expandRatio: 0.52, duration: 0.6, ease: 'power3.out', parallax: 0.5, tilt: 8 };
+    var root = $('[data-acc]');
+    var api = { refresh: function () {}, intro: function () {} };
+    if (!root) return api;
+    var items = [], active = -1, def = 0;
+    var useGsap = hasGsap && !reduced;
+    var canHover = !isTouch;
+
+    function grow() {
+      var n = items.length;
+      return n > 1 ? OPT.expandRatio * (n - 1) / (1 - OPT.expandRatio) : 1;
+    }
+    function resetMedia(it) {
+      if (!useGsap) return;
+      var m = $('.acc__media', it);
+      if (m) gsap.to(m, { x: 0, y: 0, rotationX: 0, rotationY: 0, duration: OPT.duration, ease: OPT.ease, overwrite: 'auto' });
+    }
+    function setActive(i, instant) {
+      if (i === active || !items[i]) return;
+      active = i;
+      var g = grow();
+      items.forEach(function (it, k) {
+        it.classList.toggle('is-active', k === i);
+        if (k !== i) resetMedia(it);
+      });
+      if (useGsap && !instant) {
+        gsap.to(items, { flexGrow: function (k) { return k === i ? g : 1; }, duration: OPT.duration, ease: OPT.ease, overwrite: true });
+      } else {
+        items.forEach(function (it, k) { it.style.flexGrow = k === i ? g : 1; });
+      }
+    }
+    function indexOf(el) {
+      var it = el && el.closest && el.closest('.acc__item');
+      return it ? items.indexOf(it) : -1;
+    }
+
+    api.refresh = function () {
+      items = $$('.acc__item', root);
+      root.style.setProperty('--acc-n', items.length);
+      root.style.setProperty('--acc-grow', grow().toFixed(3));
+      def = Math.min(OPT.defaultIndex, items.length - 1);
+      active = -1;
+      if (useGsap) root.classList.add('is-js');
+      setActive(def, true);
+    };
+
+    // Mouse: abre ao passar; parallax e inclinação seguem o cursor
+    if (canHover) {
+      root.addEventListener('mouseover', function (e) {
+        var i = indexOf(e.target);
+        if (i > -1) setActive(i);
+      });
+      root.addEventListener('mouseleave', function () {
+        if (!root.contains(document.activeElement)) setActive(def);
+      });
+      if (useGsap) {
+        root.addEventListener('mousemove', function (e) {
+          var it = items[active];
+          if (!it || !it.contains(e.target)) return;
+          var r = it.getBoundingClientRect();
+          var px = (e.clientX - r.left) / r.width - 0.5;
+          var py = (e.clientY - r.top) / r.height - 0.5;
+          gsap.to($('.acc__media', it), {
+            x: -px * OPT.parallax * 60, y: -py * OPT.parallax * 40,
+            rotationY: px * OPT.tilt, rotationX: -py * OPT.tilt, transformPerspective: 900,
+            duration: OPT.duration, ease: OPT.ease, overwrite: 'auto'
+          });
+        });
+      }
+    }
+    // Teclado: o foco abre a faixa
+    root.addEventListener('focusin', function (e) {
+      var i = indexOf(e.target);
+      if (i > -1) setActive(i);
+    });
+    root.addEventListener('focusout', function (e) {
+      if (!root.contains(e.relatedTarget) && !root.matches(':hover')) setActive(def);
+    });
+    // Toque: faixa fechada abre; aberta leva ao prato no cardápio.
+    // Guarda qual estava aberta antes do toque, porque o foco do toque já abre a faixa.
+    var openAtDown = null;
+    root.addEventListener('pointerdown', function () { openAtDown = active; });
+    root.addEventListener('click', function (e) {
+      var link = e.target.closest('.acc__link');
+      if (!link) return;
+      var i = indexOf(link);
+      var was = openAtDown === null ? active : openAtDown;
+      openAtDown = null;
+      if (i !== was) { e.preventDefault(); e.stopPropagation(); setActive(i); return; }
+      if (goToMenuItem(link.getAttribute('data-dish-name'))) { e.preventDefault(); e.stopPropagation(); }
+    });
+
+    api.intro = function () {
+      if (!useGsap || !items.length) return;
+      gsap.fromTo(items, { autoAlpha: 0, y: 60 }, {
+        autoAlpha: 1, y: 0, duration: 1.2, ease: EASE, stagger: 0.06,
+        scrollTrigger: { trigger: root, start: 'top 85%', toggleActions: 'play none none none' }
+      });
+    };
+
+    api.refresh();
+    return api;
+  })();
+
+  // Leva até o prato no cardápio: troca a aba e destaca o item.
+  // Devolve false se o prato não estiver no cardápio (aí o link só rola até ele).
+  function goToMenuItem(name) {
+    if (!name || !tabsEl || !listEl) return false;
+    var norm = Sheet && Sheet.norm ? Sheet.norm : function (x) {
+      return String(x).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+    };
+    var key = norm(name);
+    var cat = MENU.filter(function (c) {
+      var all = c.groups ? c.groups.reduce(function (a, g) { return a.concat(g.items); }, []) : (c.items || []);
+      return all.some(function (it) { return norm(it.n) === key; });
+    })[0];
+    if (!cat) return false;
+    var find = function () {
+      return $$('.menu-item', listEl).filter(function (el) {
+        var n = $('.menu-item__name', el);
+        return n && norm(n.textContent) === key;
+      })[0];
+    };
+    var wait = cat.id !== currentCat;
+    var tab = document.getElementById('tab-' + cat.id);
+    if (tab && wait) tab.click();
+    setTimeout(function () {
+      var el = find();
+      if (!el && cheapEl && cheapEl.checked) { cheapEl.checked = false; renderMenu(false); el = find(); }
+      if (!el) { scrollToTarget($('#cardapio')); return; }
+      var y = el.getBoundingClientRect().top + window.pageYOffset - headerOffset() - (tabsEl.offsetHeight || 0) - 32;
+      headerLockUntil = Date.now() + 1700;
+      if (lenis) lenis.scrollTo(y, { duration: 1.4 });
+      else window.scrollTo({ top: y, behavior: reduced ? 'auto' : 'smooth' });
+      el.classList.remove('is-flash');
+      void el.offsetWidth;
+      el.classList.add('is-flash');
+      setTimeout(function () { el.classList.remove('is-flash'); }, 2600);
+    }, wait && !reduced && hasGsap ? 420 : 0);
+    if (history.replaceState) history.replaceState(null, '', '#cardapio');
+    return true;
   }
 
   function renderEvents(list, initial) {
@@ -1175,11 +1322,8 @@
     if (img) tl.fromTo(img, { scale: 1.25 }, { scale: 1, duration: 1.8, ease: EASE }, 0);
   });
 
-  // Cards de delícias: entrada escalonada
-  gsap.fromTo('.dish', { autoAlpha: 0, y: 60 }, {
-    autoAlpha: 1, y: 0, duration: 1.2, ease: EASE, stagger: 0.12,
-    scrollTrigger: { trigger: '.delights__rail', start: 'top 85%', toggleActions: 'play none none none' }
-  });
+  // Galeria das delícias: entrada escalonada (stagger 0.06)
+  acc.intro();
 
   // Painel do cardápio
   gsap.fromTo('.menu-panel, .menu-photo', { autoAlpha: 0, y: 40 }, {
@@ -1241,13 +1385,6 @@
       });
     });
 
-    // Cards de delícias em velocidades levemente diferentes
-    $$('.dish').forEach(function (d, i) {
-      gsap.to(d, {
-        y: i % 2 ? -22 : 10, ease: 'none',
-        scrollTrigger: { trigger: '.delights', start: 'top bottom', end: 'bottom top', scrub: 1 }
-      });
-    });
   });
 
   // Celular: parallax leve, só transform, para manter a fluidez

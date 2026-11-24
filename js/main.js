@@ -382,8 +382,8 @@
     e.preventDefault();
     var reserveType = a.getAttribute('data-reserve');
     if (reserveType) {
-      var sel = $('#f-tipo');
-      if (sel) sel.value = reserveType;
+      var rf = $('.form-card');
+      if (rf && rf.setTipo) rf.setTipo(reserveType);
     }
     if (drawer && drawer.classList.contains('is-open')) {
       setDrawer(false);
@@ -520,21 +520,207 @@
     }, 4200);
   }
   if (form) {
+    var WA_NUMBER = INFO.whatsapp || '5581979003779';
+    var WEEKDAYS = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+    var TIPO_FRASE = {
+      'Mesa': 'reservar uma mesa',
+      'Aniversário': 'reservar para comemorar um aniversário',
+      'Confraternização': 'reservar para uma confraternização',
+      'Evento': 'reservar para um evento'
+    };
+    var dateRow = $('[data-date-row]', form);
     var dateInput = $('.date-input', form);
-    var today = recifeNow();
-    dateInput.min = isoDate(today);
-    $$('input[name="dia"]', form).forEach(function (r) {
-      r.addEventListener('change', function () {
-        dateInput.hidden = r.value !== 'outra' || !r.checked;
-        if (!dateInput.hidden) dateInput.focus();
-      });
-    });
     var nome = $('#f-nome');
+    var pessoas = $('#f-pessoas');
+    var obs = $('#f-obs');
+    var bubble = $('[data-wa-bubble]', form);
+    var waStatus = $('[data-wa-status]', form);
+    var bdayCheck = $('input[name="aniversario"]', form);
+    var lastLines = [];
+
+    var dd = function (d) { return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'); };
+    var addDays = function (d, n) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() + n); return x; };
+    var nextWeekday = function (d, wd) { return addDays(d, (wd - d.getDay() + 7) % 7); };
+
+    // Datas reais embaixo de cada opção de dia. Sábado e domingo somem quando
+    // já são "hoje" ou "amanhã", para não ter duas opções iguais.
+    var dayDates = {};
+    function refreshDays() {
+      var now = recifeNow();
+      var today = addDays(now, 0);
+      dayDates = { hoje: today, amanha: addDays(today, 1), sabado: nextWeekday(today, 6), domingo: nextWeekday(today, 0) };
+      dateInput.min = isoDate(today);
+      Object.keys(dayDates).forEach(function (k) {
+        var radio = $('input[name="dia"][value="' + k + '"]', form);
+        var chip = radio.closest('.chip');
+        $('small', chip).textContent = (k === 'hoje' || k === 'amanha' ? WEEKDAYS[dayDates[k].getDay()].replace(/^./, function (c) { return c.toUpperCase(); }) + ' ' : '') + dd(dayDates[k]);
+        var dup = (k === 'sabado' || k === 'domingo') && (isoDate(dayDates[k]) === isoDate(dayDates.hoje) || isoDate(dayDates[k]) === isoDate(dayDates.amanha));
+        chip.hidden = dup;
+        if (dup && radio.checked) radio.checked = false;
+      });
+      // Depois das 21h não dá mais para reservar para hoje
+      var hojeRadio = $('input[name="dia"][value="hoje"]', form);
+      var closedToday = now.getHours() >= 21;
+      hojeRadio.closest('.chip').hidden = closedToday;
+      if (closedToday && hojeRadio.checked) hojeRadio.checked = false;
+      refreshHours();
+    }
+
+    // Para hoje, horários que já passaram ficam indisponíveis
+    function refreshHours() {
+      var isToday = (selectedDate() || {}).iso === isoDate(recifeNow());
+      var h = recifeNow().getHours();
+      $$('input[name="hora"]', form).forEach(function (r) {
+        var past = isToday && parseInt(r.value, 10) <= h;
+        r.disabled = past;
+        if (past && r.checked) r.checked = false;
+      });
+    }
+
+    function selectedDate() {
+      var dia = (form.querySelector('input[name="dia"]:checked') || {}).value;
+      if (!dia) return null;
+      if (dia === 'outra') {
+        if (!dateInput.value) return { key: 'outra' };
+        var p = dateInput.value.split('-');
+        var d = new Date(+p[0], +p[1] - 1, +p[2]);
+        return { key: 'outra', date: d, iso: dateInput.value };
+      }
+      return { key: dia, date: dayDates[dia], iso: isoDate(dayDates[dia]) };
+    }
+
+    function dayText(sel) {
+      if (!sel || !sel.date) return '';
+      var wd = WEEKDAYS[sel.date.getDay()];
+      var base = wd + (sel.date.getDay() > 0 && sel.date.getDay() < 6 ? '-feira' : '') + ', ' + dd(sel.date);
+      if (sel.key === 'hoje') return 'hoje, ' + base;
+      if (sel.key === 'amanha') return 'amanhã, ' + base;
+      return base;
+    }
+
+    function readForm() {
+      var n = nome.value.trim().replace(/\s+/g, ' ');
+      var q = Math.max(1, parseInt(pessoas.value, 10) || 1);
+      return {
+        nome: n,
+        primeiro: n.split(' ')[0],
+        tipo: (form.querySelector('input[name="tipo"]:checked') || {}).value || 'Mesa',
+        pessoas: q,
+        dia: dayText(selectedDate()),
+        hora: (form.querySelector('input[name="hora"]:checked') || {}).value || '',
+        aniversario: bdayCheck.checked,
+        obs: obs.value.trim()
+      };
+    }
+
+    // Mensagem com a cara do Garden. *negrito* e _itálico_ são do WhatsApp.
+    function buildLines(f, forPreview) {
+      var lines = [];
+      var quem = f.nome ? 'Aqui é *' + f.nome + '* e eu' : 'Eu';
+      lines.push('Olá, Garden! 🌿');
+      lines.push(quem + ' gostaria de ' + TIPO_FRASE[f.tipo] + '.');
+      lines.push('');
+      lines.push('👥 *Pessoas:* ' + f.pessoas + (f.pessoas === 1 ? ' pessoa' : ' pessoas'));
+      lines.push('📅 *Dia:* ' + (f.dia || (forPreview ? '…' : 'a combinar')));
+      lines.push('🕖 *Horário:* ' + (f.hora || (forPreview ? '…' : 'a combinar')));
+      if (f.aniversario || f.tipo === 'Aniversário') lines.push('🎂 *Tem aniversariante na mesa!*');
+      if (f.obs) lines.push('📝 *Observações:* ' + f.obs.replace(/\s*\n\s*/g, ' '));
+      lines.push('');
+      lines.push('Pode confirmar pra mim? Até já! ☕');
+      lines.push('_Enviado pelo site do Garden Café_');
+      return lines;
+    }
+
+    function waToHtml(line) {
+      var safe = escapeHtml(line);
+      return safe
+        .replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>')
+        .replace(/(^|\s)_([^_\n]+)_(?=\s|$)/g, '$1<em>$2</em>');
+    }
+
+    function renderPreview() {
+      var lines = buildLines(readForm(), true);
+      bubble.innerHTML = lines.map(function (l, i) {
+        var changed = !reduced && lastLines.length && lastLines[i] !== l;
+        return '<span class="wa-line' + (changed ? ' is-new' : '') + '">' + (l ? waToHtml(l) : '&nbsp;') + '</span>';
+      }).join('');
+      lastLines = lines;
+      // A marca de "mudou" some com uma transição suave
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          $$('.wa-line.is-new', bubble).forEach(function (el) { el.classList.remove('is-new'); });
+        });
+      });
+      updateSteps();
+    }
+
+    function updateSteps() {
+      var f = readForm();
+      var steps = $$('.form-step', form);
+      steps[0].classList.toggle('is-done', !!f.nome);
+      steps[1].classList.toggle('is-done', !!(f.dia && f.hora));
+    }
+
+    // Digitação suave: linha do campo pulsa, prévia mostra "digitando…"
+    var typingTimer;
+    var previewTimer;
+    function onTyping(input) {
+      var ctrl = input.closest('.control');
+      if (ctrl) {
+        ctrl.classList.toggle('is-filled', !!input.value.trim());
+        if (!reduced) {
+          ctrl.classList.remove('is-typing');
+          void ctrl.offsetWidth;
+          ctrl.classList.add('is-typing');
+        }
+      }
+      waStatus.classList.add('is-typing');
+      waStatus.textContent = 'digitando';
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(function () {
+        waStatus.classList.remove('is-typing');
+        waStatus.textContent = 'para o WhatsApp do Garden';
+      }, 900);
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(renderPreview, 120);
+    }
+
+    function autoGrow(t) {
+      t.style.height = 'auto';
+      t.style.height = Math.max(76, t.scrollHeight + 3) + 'px';
+    }
+
     nome.addEventListener('input', function () {
       nome.closest('.field').classList.remove('has-error');
       $('#f-nome-err').textContent = '';
       nome.removeAttribute('aria-invalid');
+      nome.closest('.control').classList.toggle('is-valid', nome.value.trim().length >= 2);
+      onTyping(nome);
     });
+    obs.addEventListener('input', function () {
+      autoGrow(obs);
+      var c = $('[data-count]', form);
+      c.textContent = obs.value.length;
+      c.parentNode.classList.toggle('is-on', obs.value.length > 0);
+      onTyping(obs);
+    });
+
+    // Quantidade de pessoas
+    function setPessoas(v, bump) {
+      var min = +pessoas.min, max = +pessoas.max;
+      v = Math.min(max, Math.max(min, parseInt(v, 10) || min));
+      pessoas.value = v;
+      $('[data-step="-1"]', form).disabled = v <= min;
+      $('[data-step="1"]', form).disabled = v >= max;
+      if (bump && !reduced) { pessoas.classList.remove('is-bump'); void pessoas.offsetWidth; pessoas.classList.add('is-bump'); }
+      renderPreview();
+    }
+    $$('.stepper__btn', form).forEach(function (b) {
+      b.addEventListener('click', function () { setPessoas((parseInt(pessoas.value, 10) || 1) + +b.getAttribute('data-step'), true); });
+    });
+    pessoas.addEventListener('input', function () { if (pessoas.value !== '') renderPreview(); });
+    pessoas.addEventListener('blur', function () { setPessoas(pessoas.value); });
+
     var setErr = function (id, msg) {
       var el = $('#' + id);
       if (!el) return;
@@ -543,53 +729,63 @@
     };
     form.addEventListener('change', function (e) {
       var n = e.target.name;
-      if (n === 'dia' || n === 'data') setErr('f-dia-err', '');
+      if (n === 'dia') {
+        var outra = e.target.value === 'outra';
+        dateRow.hidden = !outra;
+        if (outra) dateInput.focus();
+      }
+      if (n === 'dia' || n === 'data') { setErr('f-dia-err', ''); refreshHours(); }
       if (n === 'hora') setErr('f-hora-err', '');
+      if (n === 'tipo' && e.target.value === 'Aniversário') bdayCheck.checked = true;
+      renderPreview();
     });
+
+    // Atalhos do site ("Faça sua reserva" do evento, cards de aniversário…)
+    form.setTipo = function (tipo) {
+      var r = $('input[name="tipo"][value="' + tipo + '"]', form);
+      if (!r) return;
+      r.checked = true;
+      if (tipo === 'Aniversário') bdayCheck.checked = true;
+      renderPreview();
+    };
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      var fd = new FormData(form);
-      var n = String(fd.get('nome') || '').trim();
-      if (!n) {
+      refreshHours();
+      var f = readForm();
+      if (!f.nome) {
         nome.closest('.field').classList.add('has-error');
         nome.setAttribute('aria-invalid', 'true');
-        nome.setAttribute('aria-describedby', 'f-nome-err');
         $('#f-nome-err').textContent = 'Como devemos te chamar?';
         nome.focus();
         return;
       }
-      var dia = fd.get('dia');
-      var hora = fd.get('hora');
-      var dv = fd.get('data');
+      var sel = selectedDate();
       var firstBad = null;
-      if (!dia || (dia === 'outra' && !dv)) {
-        setErr('f-dia-err', dia ? 'Escolha a data no calendário.' : 'Escolha o dia da reserva.');
-        firstBad = dia ? dateInput : $('input[name="dia"]', form);
+      if (!sel || !sel.date) {
+        setErr('f-dia-err', sel ? 'Escolha a data no calendário.' : 'Escolha o dia da reserva.');
+        firstBad = sel ? dateInput : $('input[name="dia"]:not([disabled])', form);
+      } else if (sel.iso < isoDate(recifeNow())) {
+        setErr('f-dia-err', 'Essa data já passou. Escolha outra.');
+        firstBad = dateInput;
       }
-      if (!hora) {
+      if (!f.hora) {
         setErr('f-hora-err', 'Escolha o horário.');
-        firstBad = firstBad || $('input[name="hora"]', form);
+        firstBad = firstBad || $('input[name="hora"]:not([disabled])', form);
       }
       if (firstBad) {
         firstBad.focus();
         firstBad.closest('fieldset').scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' });
         return;
       }
-      if (dia === 'outra') {
-        var p = String(dv).split('-'); dia = 'dia ' + p[2] + '/' + p[1];
-      } else {
-        var dl = String(dia).toLowerCase();
-        dia = (dl === 'hoje' || dl === 'amanhã') ? dl : 'no ' + dl;
-      }
-      var msg = 'Olá, Garden! Sou ' + n + '. Quero reservar: ' + fd.get('tipo') + ', ' + fd.get('pessoas') + (fd.get('pessoas') === '1' ? ' pessoa, ' : ' pessoas, ') + dia + ' às ' + hora + '.';
-      if (fd.get('aniversario')) msg += ' É aniversário!';
-      var obs = String(fd.get('obs') || '').trim();
-      if (obs) msg += ' Observações: ' + obs;
-      var url = 'https://wa.me/' + (INFO.whatsapp || '5581979003779') + '?text=' + encodeURIComponent(msg);
-      showToast('Reserva pronta', 'Abrindo o WhatsApp do Garden…');
+      var msg = buildLines(f, false).join('\n');
+      var url = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(msg);
+      showToast('Reserva pronta, ' + f.primeiro + '!', 'Abrindo o WhatsApp do Garden…');
       setTimeout(function () { window.open(url, '_blank', 'noopener'); }, 450);
     });
+
+    refreshDays();
+    setPessoas(pessoas.value);
   }
 
   /* ------------------------------------------------------------------------

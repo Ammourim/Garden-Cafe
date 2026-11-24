@@ -663,16 +663,22 @@
 
     // Quantidade de pessoas
     function setPessoas(v, bump) {
-      var min = +pessoas.min, max = +pessoas.max;
+      var min = +pessoas.getAttribute('data-min'), max = +pessoas.getAttribute('data-max');
       v = Math.min(max, Math.max(min, parseInt(v, 10) || min));
       pessoas.value = v;
       $('[data-step="-1"]', form).disabled = v <= min;
       $('[data-step="1"]', form).disabled = v >= max;
       if (bump && !reduced) { pessoas.classList.remove('is-bump'); void pessoas.offsetWidth; pessoas.classList.add('is-bump'); }
+      var pr = pessoas.closest('[data-caret]');
+      if (pr && pr.caretUpdate) pr.caretUpdate();
       updateSteps();
     }
     $$('.stepper__btn', form).forEach(function (b) {
       b.addEventListener('click', function () { setPessoas((parseInt(pessoas.value, 10) || 1) + +b.getAttribute('data-step'), true); });
+    });
+    pessoas.addEventListener('input', function () { pessoas.value = pessoas.value.replace(/\D+/g, '').slice(0, 2); });
+    pessoas.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); setPessoas((parseInt(pessoas.value, 10) || 1) + (e.key === 'ArrowUp' ? 1 : -1), true); }
     });
     pessoas.addEventListener('blur', function () { setPessoas(pessoas.value); });
 
@@ -746,54 +752,97 @@
 
   /* ------------------------------------------------------------------------
      Caret suave (adaptado de movin.design/components/inputs/caret)
-     O caret nativo fica transparente. A posição dele (recuo + largura do texto
-     antes do cursor, medida num canvas com a fonte do campo, menos a rolagem
-     horizontal) move um caret desenhado; um rastro de 1px esticado entre o
+     O caret nativo fica transparente e um caret desenhado segue o cursor.
+     A posição vem de um "espelho" invisível com o mesmo estilo do campo: o
+     texto antes do cursor + um marcador. Funciona em campo de uma linha e em
+     textarea (várias linhas). Ao saltar, um rastro de 1px esticado entre o
      ponto antigo e o novo encolhe até ele. Só pisca quando está parado.
      ------------------------------------------------------------------------ */
+  var CARET_PROPS = ['boxSizing', 'width', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+    'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'borderStyle',
+    'fontStyle', 'fontVariant', 'fontWeight', 'fontStretch', 'fontSize', 'lineHeight', 'fontFamily',
+    'letterSpacing', 'wordSpacing', 'textTransform', 'textIndent', 'textAlign', 'tabSize', 'fontFeatureSettings'];
+  var caretMirror = null;
+
+  function caretPoint(el) {
+    var multi = el.tagName === 'TEXTAREA';
+    var cs = getComputedStyle(el);
+    if (!caretMirror) {
+      caretMirror = document.createElement('div');
+      caretMirror.setAttribute('aria-hidden', 'true');
+      caretMirror.style.cssText = 'position:absolute;top:0;left:-9999px;visibility:hidden;overflow:hidden;pointer-events:none';
+      document.body.appendChild(caretMirror);
+    }
+    CARET_PROPS.forEach(function (k) { caretMirror.style[k] = cs[k]; });
+    caretMirror.style.whiteSpace = multi ? 'pre-wrap' : 'pre';
+    caretMirror.style.overflowWrap = multi ? 'break-word' : 'normal';
+    caretMirror.style.height = 'auto';
+    var pos = el.selectionEnd == null ? el.value.length : el.selectionEnd;
+    caretMirror.textContent = el.value.slice(0, pos);
+    var mark = document.createElement('span');
+    mark.textContent = '​';
+    caretMirror.appendChild(mark);
+    caretMirror.appendChild(document.createTextNode(el.value.slice(pos) || ''));
+    var x = mark.offsetLeft - el.scrollLeft;
+    var bl = parseFloat(cs.borderLeftWidth), pl = parseFloat(cs.paddingLeft), pr = parseFloat(cs.paddingRight);
+    x = Math.max(bl + pl - 1, Math.min(el.offsetWidth - parseFloat(cs.borderRightWidth) - pr, x));
+    var lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.3;
+    var h = Math.round(Math.min(lh, parseFloat(cs.fontSize) * 1.4));
+    var y;
+    if (multi) {
+      y = mark.offsetTop - el.scrollTop + (lh - h) / 2;
+      var top = parseFloat(cs.borderTopWidth), bottom = el.offsetHeight - parseFloat(cs.borderBottomWidth) - h;
+      y = Math.max(top, Math.min(bottom, y));
+    } else {
+      y = (el.offsetHeight - h) / 2; // o navegador centraliza a linha no campo
+    }
+    return { x: el.offsetLeft + x, y: el.offsetTop + y, h: h };
+  }
+
   function initCaret(root) {
     var input = $('.field-caret__input', root);
     var tail = $('.field-caret__tail', root);
-    var ctx = document.createElement('canvas').getContext('2d');
-    if (!input || !ctx) return;
-    var x = null;
+    if (!input) return;
+    var last = null;
     var timer = 0;
 
-    function measure() {
-      var cs = getComputedStyle(input);
-      ctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
-      var pl = parseFloat(cs.paddingLeft);
-      var text = input.value.slice(0, input.selectionEnd == null ? 0 : input.selectionEnd);
-      var at = pl + ctx.measureText(text).width - input.scrollLeft;
-      var clamped = Math.max(pl - 1, Math.min(input.clientWidth - parseFloat(cs.paddingRight), at));
-      return input.offsetLeft + parseFloat(cs.borderLeftWidth) + clamped;
-    }
     function update() {
       var on = document.activeElement === input && input.selectionStart === input.selectionEnd;
       root.classList.toggle('field-caret--on', on);
       if (!on) return;
-      var nx = measure();
-      if (nx === x) return;
-      if (x !== null && tail && !reduced && tail.animate && Math.abs(nx - x) > 3) {
-        tail.classList.toggle('field-caret__tail--left', nx < x);
+      var pt = caretPoint(input);
+      if (last && pt.x === last.x && pt.y === last.y) return;
+      var sameLine = last && Math.abs(pt.y - last.y) < 2;
+      if (sameLine && tail && !reduced && tail.animate && Math.abs(pt.x - last.x) > 3) {
+        tail.classList.toggle('field-caret__tail--left', pt.x < last.x);
+        var ty = pt.y + pt.h / 2 - 8;
         tail.animate([
-          { opacity: 1, transform: 'translateX(' + Math.min(x, nx) + 'px) scaleX(' + Math.abs(nx - x) + ')' },
-          { opacity: 0, transform: 'translateX(' + nx + 'px) scaleX(1)' }
+          { opacity: 1, transform: 'translate(' + Math.min(last.x, pt.x) + 'px,' + ty + 'px) scaleX(' + Math.abs(pt.x - last.x) + ')' },
+          { opacity: 0, transform: 'translate(' + pt.x + 'px,' + ty + 'px) scaleX(1)' }
         ], { duration: 260, easing: 'cubic-bezier(0.2, 0, 0, 1)' });
       }
-      x = nx;
-      root.style.setProperty('--field-caret-x', nx.toFixed(1) + 'px');
+      // Ao mudar de linha o caret vai direto, sem deslizar na diagonal
+      root.classList.toggle('field-caret--jump', !!last && !sameLine);
+      last = pt;
+      root.style.setProperty('--field-caret-x', pt.x.toFixed(1) + 'px');
+      root.style.setProperty('--field-caret-y', pt.y.toFixed(1) + 'px');
+      root.style.setProperty('--field-caret-h', pt.h + 'px');
       root.classList.add('field-caret--moving');
       clearTimeout(timer);
       timer = setTimeout(function () { root.classList.remove('field-caret--moving'); }, 500);
     }
-    input.addEventListener('input', update);
+    // Depois de redimensionar (textarea que cresce) mede no próximo quadro
+    var later = function () { requestAnimationFrame(update); };
+    input.addEventListener('input', function () { update(); later(); });
     input.addEventListener('focus', update);
-    input.addEventListener('blur', function () { x = null; update(); });
+    input.addEventListener('blur', function () { last = null; update(); });
     input.addEventListener('scroll', update);
+    input.addEventListener('transitionend', update);
     document.addEventListener('selectionchange', function () { if (document.activeElement === input) update(); });
-    // A fonte da web pode chegar depois do primeiro desenho: mede de novo
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { x = null; update(); });
+    window.addEventListener('resize', function () { last = null; if (document.activeElement === input) update(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { last = null; update(); });
+    // Atualizações feitas por código (botões − e +)
+    root.caretUpdate = later;
   }
 
   /* ------------------------------------------------------------------------

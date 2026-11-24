@@ -369,7 +369,7 @@
               <label for="f-pessoas" id="f-pessoas-label">Quantas pessoas?</label>
               <div class="stepper">
                 <button class="stepper__btn" type="button" data-step="-1" aria-label="Menos uma pessoa" aria-controls="f-pessoas"><svg class="ic"><use href="#i-minus"/></svg></button>
-                <input id="f-pessoas" name="pessoas" type="number" inputmode="numeric" min="1" max="60" value="2" aria-describedby="f-pessoas-hint">
+                <span class="field-caret stepper__value" data-caret><input id="f-pessoas" class="field-caret__input" name="pessoas" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" data-min="1" data-max="60" value="2" role="spinbutton" aria-valuemin="1" aria-valuemax="60" aria-describedby="f-pessoas-hint"><span class="field-caret__tail" aria-hidden="true"></span><span class="field-caret__head" aria-hidden="true"></span></span>
                 <button class="stepper__btn" type="button" data-step="1" aria-label="Mais uma pessoa" aria-controls="f-pessoas"><svg class="ic"><use href="#i-plus"/></svg></button>
               </div>
               <span class="hint hint--block" id="f-pessoas-hint">Mais de 15? A gente monta o espaço com você.</span>
@@ -416,8 +416,9 @@
             </label>
             <div class="field field--full">
               <label for="f-obs">Observações <span class="optional">(opcional)</span></label>
-              <div class="control control--area">
-                <textarea id="f-obs" name="obs" rows="2" maxlength="280" placeholder="Mesa na área externa, cadeirinha para criança, restrição alimentar…" aria-describedby="f-obs-count"></textarea>
+              <div class="control control--area field-caret" data-caret>
+                <textarea id="f-obs" class="field-caret__input" name="obs" rows="2" maxlength="280" placeholder="Mesa na área externa, cadeirinha para criança, restrição alimentar…" aria-describedby="f-obs-count"></textarea>
+                <span class="field-caret__tail" aria-hidden="true"></span><span class="field-caret__head" aria-hidden="true"></span>
               </div>
               <span class="counter" id="f-obs-count" aria-live="off"><span data-count>0</span>/280</span>
             </div>

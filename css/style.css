@@ -464,14 +464,16 @@ figure{margin:0}
    o caret nativo fica transparente e um caret desenhado segue o texto,
    deixando um rastro curto quando salta. Pisca só quando está parado. */
 .control{position:relative}
-.field-caret{--field-caret-x:0px}
-.field .field-caret input.field-caret__input{caret-color:transparent}
-.field-caret__head,.field-caret__tail{position:absolute;top:50%;left:0;border-radius:1px;pointer-events:none}
-.field-caret__head{width:2px;height:22px;margin-top:-11px;background:var(--terracota-600);opacity:0;transform:translateX(var(--field-caret-x));transition:transform .09s cubic-bezier(.2,0,0,1),opacity .1s}
-.field-caret__tail{width:1px;height:16px;margin-top:-8px;background:linear-gradient(90deg, rgba(168,85,31,0), rgba(168,85,31,.55));opacity:0;transform-origin:0 50%}
+.field-caret{--field-caret-x:0px;--field-caret-y:0px}
+.field .field-caret .field-caret__input{caret-color:transparent}
+.field-caret__head,.field-caret__tail{position:absolute;top:0;left:0;border-radius:1px;pointer-events:none}
+.field-caret__head{width:2px;height:var(--field-caret-h, 22px);background:var(--terracota-600);opacity:0;transform:translate(var(--field-caret-x), var(--field-caret-y));transition:transform .09s cubic-bezier(.2,0,0,1),opacity .1s}
+.field-caret--jump .field-caret__head{transition:opacity .1s}
+.field-caret__tail{width:1px;height:16px;background:linear-gradient(90deg, rgba(168,85,31,0), rgba(168,85,31,.55));opacity:0;transform-origin:0 50%}
 .field-caret__tail--left{background:linear-gradient(270deg, rgba(168,85,31,0), rgba(168,85,31,.55))}
 .field-caret--on .field-caret__head{opacity:1;animation:field-caret-blink 1.06s steps(1) .5s infinite}
 .field-caret--moving .field-caret__head{animation:none}
+.stepper__value{position:relative;display:inline-block}
 @keyframes field-caret-blink{50%{opacity:0}}
 
 .field input[type="text"],.field input[type="date"],.field textarea,.select select{width:100%;min-height:50px;padding:12px 14px;border-radius:var(--radius-md);border:1.5px solid var(--border-subtle);background:var(--creme-50);font:400 16px/1.4 var(--font-sans);color:var(--tinta-800);caret-color:var(--terracota-600);transition:border-color var(--dur-slow) var(--ease-out),box-shadow var(--dur-slow) var(--ease-out),background-color var(--dur-slow) var(--ease-out);-webkit-appearance:none;appearance:none}
@@ -511,6 +513,7 @@ fieldset .field__error{margin-top:10px}
 .stepper__btn:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .stepper input{width:44px;height:40px;border:0;background:transparent;text-align:center;font:700 18px/1 var(--font-sans);color:var(--cafe-900);font-variant-numeric:tabular-nums;-moz-appearance:textfield;appearance:textfield}
 .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.field .stepper input[type="text"],.field .stepper input[type="text"]:focus{width:44px;min-height:0;height:40px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;text-align:center;font:700 18px/1 var(--font-sans);color:var(--cafe-900)}
 .stepper input:focus{outline:none}
 .stepper input.is-bump{animation:bump .32s var(--ease-out)}
 @keyframes bump{0%{transform:translateY(0)}35%{transform:translateY(-3px) scale(1.08)}100%{transform:none}}

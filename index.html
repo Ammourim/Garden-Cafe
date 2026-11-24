@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,700&family=Oswald:wght@500;600;700&family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800;1,6..12,400&display=swap">
   <link rel="preload" as="image" href="assets/img/cabeleira-do-zeze.webp">
-  <link rel="stylesheet" href="css/style.css?v=4">
+  <link rel="stylesheet" href="css/style.css?v=5">
 
   <script>
     // Ativa os estados iniciais das animações só quando há JS e o usuário não pediu menos movimento.
@@ -346,14 +346,14 @@
         <form class="form-card" id="reserva-form" novalidate data-reveal>
           <div class="form-step">
             <p class="form-step__title"><span class="form-step__num" aria-hidden="true">1</span>Quem vem</p>
-            <div class="field field--full">
-              <label for="f-nome">Seu nome</label>
-              <div class="control field-caret" data-caret>
+            <div class="field field--full field-caret" data-caret>
+              <label class="field-caret__name" for="f-nome">Seu nome</label>
+              <span class="control field-caret__box">
                 <input id="f-nome" class="field-caret__input" name="nome" type="text" autocomplete="name" autocapitalize="words" maxlength="60" placeholder="Como devemos te chamar?" required aria-describedby="f-nome-err">
                 <span class="field-caret__tail" aria-hidden="true"></span>
                 <span class="field-caret__head" aria-hidden="true"></span>
                 <span class="control__ok" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span>
-              </div>
+              </span>
               <span class="field__error" id="f-nome-err" role="alert"></span>
             </div>
             <fieldset class="field field--full">
@@ -367,9 +367,9 @@
             </fieldset>
             <div class="field field--full field--row">
               <label for="f-pessoas" id="f-pessoas-label">Quantas pessoas?</label>
-              <div class="stepper">
+              <div class="stepper field-caret" data-caret>
                 <button class="stepper__btn" type="button" data-step="-1" aria-label="Menos uma pessoa" aria-controls="f-pessoas"><svg class="ic"><use href="#i-minus"/></svg></button>
-                <span class="field-caret stepper__value" data-caret><input id="f-pessoas" class="field-caret__input" name="pessoas" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" data-min="1" data-max="60" value="2" role="spinbutton" aria-valuemin="1" aria-valuemax="60" aria-describedby="f-pessoas-hint"><span class="field-caret__tail" aria-hidden="true"></span><span class="field-caret__head" aria-hidden="true"></span></span>
+                <span class="field-caret__box stepper__value"><input id="f-pessoas" class="field-caret__input" name="pessoas" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" data-min="1" data-max="60" value="2" role="spinbutton" aria-valuemin="1" aria-valuemax="60" aria-describedby="f-pessoas-hint"><span class="field-caret__tail" aria-hidden="true"></span><span class="field-caret__head" aria-hidden="true"></span></span>
                 <button class="stepper__btn" type="button" data-step="1" aria-label="Mais uma pessoa" aria-controls="f-pessoas"><svg class="ic"><use href="#i-plus"/></svg></button>
               </div>
               <span class="hint hint--block" id="f-pessoas-hint">Mais de 15? A gente monta o espaço com você.</span>
@@ -385,10 +385,14 @@
                 <label class="chip chip--date"><input type="radio" name="dia" value="amanha"><span>Amanhã<small data-date-for="1"></small></span></label>
                 <label class="chip chip--date"><input type="radio" name="dia" value="sabado"><span>Sábado<small data-date-for="sat"></small></span></label>
                 <label class="chip chip--date"><input type="radio" name="dia" value="domingo"><span>Domingo<small data-date-for="sun"></small></span></label>
-                <label class="chip chip--date"><input type="radio" name="dia" value="outra"><span>Outra data<small>calendário</small></span></label>
+                <label class="chip chip--date"><input type="radio" name="dia" value="outra"><span>Outra data<small>digite o dia</small></span></label>
               </div>
-              <div class="reveal-row" data-date-row hidden>
-                <div class="control"><input class="date-input" type="date" name="data" aria-label="Escolha a data"></div>
+              <div class="reveal-row field-caret" data-date-row data-caret hidden>
+                <span class="control field-caret__box field-caret__box--date">
+                  <input id="f-data" class="field-caret__input date-input" name="data" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa" aria-label="Data da reserva, no formato dia, mês e ano">
+                  <span class="field-caret__tail" aria-hidden="true"></span>
+                  <span class="field-caret__head" aria-hidden="true"></span>
+                </span>
               </div>
               <span class="field__error" id="f-dia-err" role="alert"></span>
             </fieldset>
@@ -414,9 +418,9 @@
               <span class="check__box" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span>
               <span><strong>Tem aniversariante na mesa</strong><small class="js-bday js-bday-off">Aniversariante no Garden ganha sobremesa!</small></span>
             </label>
-            <div class="field field--full">
-              <label for="f-obs">Observações <span class="optional">(opcional)</span></label>
-              <div class="control control--area field-caret" data-caret>
+            <div class="field field--full field-caret" data-caret>
+              <label class="field-caret__name" for="f-obs">Observações <span class="optional">(opcional)</span></label>
+              <div class="control control--area field-caret__box">
                 <textarea id="f-obs" class="field-caret__input" name="obs" rows="2" maxlength="280" placeholder="Mesa na área externa, cadeirinha para criança, restrição alimentar…" aria-describedby="f-obs-count"></textarea>
                 <span class="field-caret__tail" aria-hidden="true"></span><span class="field-caret__head" aria-hidden="true"></span>
               </div>
@@ -519,6 +523,6 @@
   <script src="js/vendor/gsap.min.js" defer></script>
   <script src="js/vendor/ScrollTrigger.min.js" defer></script>
   <script src="js/vendor/lenis.min.js" defer></script>
-  <script src="js/main.js?v=5" defer></script>
+  <script src="js/main.js?v=6" defer></script>
 </body>
 </html>

@@ -546,7 +546,6 @@
       var now = recifeNow();
       var today = addDays(now, 0);
       dayDates = { hoje: today, amanha: addDays(today, 1), sabado: nextWeekday(today, 6), domingo: nextWeekday(today, 0) };
-      dateInput.min = isoDate(today);
       Object.keys(dayDates).forEach(function (k) {
         var radio = $('input[name="dia"][value="' + k + '"]', form);
         var chip = radio.closest('.chip');
@@ -578,10 +577,11 @@
       var dia = (form.querySelector('input[name="dia"]:checked') || {}).value;
       if (!dia) return null;
       if (dia === 'outra') {
-        if (!dateInput.value) return { key: 'outra' };
-        var p = dateInput.value.split('-');
-        var d = new Date(+p[0], +p[1] - 1, +p[2]);
-        return { key: 'outra', date: d, iso: dateInput.value };
+        var m = dateInput.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        if (!m) return { key: 'outra', bad: !!dateInput.value };
+        var d = new Date(+m[3], +m[2] - 1, +m[1]);
+        if (d.getDate() !== +m[1] || d.getMonth() !== +m[2] - 1) return { key: 'outra', bad: true };
+        return { key: 'outra', date: d, iso: isoDate(d) };
       }
       return { key: dia, date: dayDates[dia], iso: isoDate(dayDates[dia]) };
     }
@@ -682,6 +682,17 @@
     });
     pessoas.addEventListener('blur', function () { setPessoas(pessoas.value); });
 
+    // Data digitada: só números, com as barras entrando sozinhas
+    dateInput.addEventListener('input', function () {
+      var dgt = dateInput.value.replace(/\D+/g, '').slice(0, 8);
+      var out = dgt.slice(0, 2);
+      if (dgt.length > 2) out += '/' + dgt.slice(2, 4);
+      if (dgt.length > 4) out += '/' + dgt.slice(4);
+      if (out !== dateInput.value) dateInput.value = out;
+      setErr('f-dia-err', '');
+      refreshHours();
+    });
+
     var setErr = function (id, msg) {
       var el = $('#' + id);
       if (!el) return;
@@ -724,7 +735,7 @@
       var sel = selectedDate();
       var firstBad = null;
       if (!sel || !sel.date) {
-        setErr('f-dia-err', sel ? 'Escolha a data no calendário.' : 'Escolha o dia da reserva.');
+        setErr('f-dia-err', !sel ? 'Escolha o dia da reserva.' : (sel.bad ? 'Data inválida. Use dd/mm/aaaa.' : 'Digite a data no formato dd/mm/aaaa.'));
         firstBad = sel ? dateInput : $('input[name="dia"]:not([disabled])', form);
       } else if (sel.iso < isoDate(recifeNow())) {
         setErr('f-dia-err', 'Essa data já passou. Escolha outra.');
@@ -747,7 +758,7 @@
 
     refreshDays();
     setPessoas(pessoas.value);
-    $$('[data-caret]', form).forEach(initCaret);
+    $$('.field-caret', form).forEach(initCaret);
   }
 
   /* ------------------------------------------------------------------------
@@ -801,8 +812,9 @@
 
   function initCaret(root) {
     var input = $('.field-caret__input', root);
+    var box = $('.field-caret__box', root);
     var tail = $('.field-caret__tail', root);
-    if (!input) return;
+    if (!input || !box) return;
     var last = null;
     var timer = 0;
 
@@ -824,9 +836,9 @@
       // Ao mudar de linha o caret vai direto, sem deslizar na diagonal
       root.classList.toggle('field-caret--jump', !!last && !sameLine);
       last = pt;
-      root.style.setProperty('--field-caret-x', pt.x.toFixed(1) + 'px');
-      root.style.setProperty('--field-caret-y', pt.y.toFixed(1) + 'px');
-      root.style.setProperty('--field-caret-h', pt.h + 'px');
+      box.style.setProperty('--field-caret-x', pt.x.toFixed(1) + 'px');
+      box.style.setProperty('--field-caret-y', pt.y.toFixed(1) + 'px');
+      box.style.setProperty('--field-caret-h', pt.h + 'px');
       root.classList.add('field-caret--moving');
       clearTimeout(timer);
       timer = setTimeout(function () { root.classList.remove('field-caret--moving'); }, 500);

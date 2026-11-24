@@ -766,7 +766,6 @@ fieldset .field__error{margin-top:10px}
 .check strong{display:block;font:700 15px/1.3 var(--font-sans);color:var(--cafe-900)}
 .check small{display:block;font-size:13px;color:var(--terracota-700)}
 
-.form-card__foot{margin:-14px 0 0;text-align:center;font-size:13px;color:var(--text-muted)}
 
 @media (max-width: 860px) {
   .reserve__grid{grid-template-columns:1fr}

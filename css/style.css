@@ -849,7 +849,9 @@ fieldset .field__error{margin-top:10px}
 .js:not(.reduced) [data-plate="main"]{opacity:.01}
 .js:not(.reduced) [data-split]{visibility:hidden}
 .js:not(.reduced) [data-split].is-split{visibility:visible}
-.split-line{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em;margin-bottom:-.08em}
+/* A máscara sobra para cima e para baixo: em caixa alta com entrelinha curta
+   (ex.: .poster), o til e os acentos passam do topo da linha e eram cortados */
+.split-line{display:inline-block;overflow:hidden;vertical-align:bottom;padding:.24em 0 .08em;margin:-.24em 0 -.08em}
 .split-word{display:inline-block;will-change:transform}
 .js:not(.reduced) [data-clip]{clip-path:inset(100% 0 0 0)}
 

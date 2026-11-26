@@ -62,6 +62,29 @@
       return Math.max(n, Math.ceil(s / n) * n);
     }
 
+    // Fotos já baixadas ficam guardadas por endereço: voltar a uma categoria não baixa
+    // nem decodifica de novo. preload() chama done quando todas chegam (ou em 3 s).
+    var pool = {}, req = 0;
+    function preload(list, done) {
+      var pending = 0, fired = false;
+      function fin() { if (!fired) { fired = true; done(); } }
+      function one() { pending--; if (pending <= 0) fin(); }
+      list.forEach(function (x) {
+        if (pool[x.src]) { if (pool[x.src].complete) return; }
+        else {
+          var im = new Image();
+          im.decoding = 'async';
+          pool[x.src] = im;
+          im.src = x.src;
+        }
+        var im2 = pool[x.src];
+        pending++;
+        im2.addEventListener('load', one, { once: true });
+        im2.addEventListener('error', one, { once: true });
+      });
+      if (pending <= 0) fin(); else setTimeout(fin, 3000);
+    }
+
     function loadImg(slot) {
       if (!armed || slot.img.getAttribute('src') === slot.src) return;
       slot.img.classList.remove('is-in');
@@ -214,14 +237,23 @@
         var k = next.map(function (x) { return x.src; }).join('|');
         if (k === key) return;
         key = k;
+        var token = ++req;
         var apply = function () { items = next; hoverCard = null; readCfg(); build(); play(); };
+        var fadeIn = function () { gsap.fromTo(stage, { autoAlpha: 0, scale: 0.94 }, { autoAlpha: 1, scale: 1, duration: 0.7, ease: 'expo.out' }); };
         if (gsap && animate && !reduced && slots.length) {
-          gsap.to(stage, {
-            autoAlpha: 0, scale: 0.94, duration: 0.22, ease: 'power1.in', overwrite: true, onComplete: function () {
-              apply();
-              gsap.fromTo(stage, { autoAlpha: 0, scale: 0.94 }, { autoAlpha: 1, scale: 1, duration: 0.7, ease: 'expo.out' });
-            }
-          });
+          // Troca com animação: some o palco e, ao mesmo tempo, baixa as fotos da nova
+          // categoria. A espiral só reaparece quando saída e fotos terminaram (ou em 3 s),
+          // então não mostra cards vazios. Fotos já vistas vêm do cache, sem espera.
+          var fadedOut = false, ready = false;
+          var go = function () {
+            if (token !== req || !fadedOut || !ready) return;
+            apply();
+            fadeIn();
+          };
+          gsap.to(stage, { autoAlpha: 0, scale: 0.94, duration: 0.22, ease: 'power1.in', overwrite: true, onComplete: function () { fadedOut = true; go(); } });
+          preload(next, function () { ready = true; go(); });
+        } else if (armed && slots.length && !reduced) {
+          preload(next, function () { if (token === req) apply(); });
         } else {
           apply();
         }
